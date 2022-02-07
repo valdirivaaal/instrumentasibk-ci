@@ -2,6 +2,12 @@
     <div id="sidebar"  class="nav-collapse ">
       <!-- sidebar menu start-->
       <ul class="sidebar-menu" id="nav-accordion">
+				<li>
+					<a href="<?= base_url('sociograph') ?>">
+						<i class="fa fa-project-diagram"></i>
+						<span>Sociograph</span>
+					</a>
+				</li>
         <li>
           <a class="<?= (getController()=='dashboard') ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
             <i class="fa fa-dashboard"></i>
