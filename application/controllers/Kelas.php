@@ -14,9 +14,36 @@ class Kelas extends CI_Controller {
 
 	public function index()
 	{
-		$data['get_kelas'] = $this->Main_model->join('kelas','*,kelas.id as id',array(array('table'=>'user_konselor','parameter'=>'user_konselor.id=kelas.konselor_id')),array('kelas.user_id'=>$this->session->userdata('id')),'kelas','asc');
-		$data['get_konselor'] = $this->Main_model->get_where('user_konselor',array('user_id'=>$this->session->userdata('id')),'nama_lengkap','asc');
-		$data['get_profil'] = $this->Main_model->get_where('user_info',array('user_id'=>$this->session->userdata('id')));
+		$data['get_kelas'] = $this->Main_model->join(
+			'kelas',
+			'*,kelas.id as id',
+			array(
+				array(
+					'table'=>'user_konselor',
+					'parameter'=>'user_konselor.id=kelas.konselor_id')
+				),
+				array('kelas.user_id'=>$this->session->userdata('id')
+			),
+			'kelas',
+			'asc'
+		);
+
+		$data['get_konselor'] = $this->Main_model->get_where(
+			'user_konselor',
+			array(
+				'user_id' => $this->session->userdata('id')
+			),
+			'nama_lengkap',
+			'asc'
+		);
+
+		$data['get_profil'] = $this->Main_model->get_where(
+			'user_info',
+			array(
+				'user_id' => $this->session->userdata('id')
+			)
+		);
+		
 		$data['content'] = 'kelas.php';
 
 		$this->load->view('main.php', $data, FALSE);
@@ -60,6 +87,39 @@ class Kelas extends CI_Controller {
 		redirect('kelas');
 	}
 
+	public function detail($id)
+	{
+		// Data kelas
+		$kelas = $this->Main_model->get_where('kelas', ['id' => $id]);
+
+		// Data siswa
+		$siswa = $this->Main_model->innerJoin(
+			"kelas_siswa",
+			"kelas.kelas as nama_kelas, kelas_siswa.*",
+			[
+				[
+					"table" => "kelas",
+					"parameter" => "kelas_siswa.id_kelas = kelas.id"
+				]
+			],
+			[
+				"kelas_siswa.id_kelas" => $id
+			]
+		);
+
+		$result = [
+			'siswa' => $siswa,
+			'kelas' => $kelas[0]
+		];
+
+		$data = [
+			'data' => $result,
+			'content' => 'layouts/kelas/detail.php',
+			'id_kelas' => $id
+		];
+
+		$this->load->view('main.php', $data, false);
+	}
 }
 
 /* End of file Kelas.php */
