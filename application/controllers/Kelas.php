@@ -3,10 +3,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Kelas extends CI_Controller {
 
+	private $filename = 'import_data';
+
 	public function __construct()
 	{
 		parent::__construct();
+
+		require_once APPPATH.'third_party/PHPExcel-1.8/Classes/PHPExcel.php';
+
 		$this->load->model('Main_model');
+		$this->load->model('SiswaModel');
+
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
@@ -119,6 +126,62 @@ class Kelas extends CI_Controller {
 		];
 
 		$this->load->view('main.php', $data, false);
+	}
+
+	public function siswa_upload($id)
+	{
+		$data = [];
+
+		if (isset($_POST['preview']))
+		{
+			$upload = $this->SiswaModel->upload_file($this->filename);
+
+			if ($upload['result'] == 'success')
+			{
+				$excel = new PHPExcel_Reader_Excel2007();
+				$loadExcel = $excel->load('excel/' . $this->filename . '.xlsx');
+				$sheet = $loadExcel->getActiveSheet()->toArray(null, true, true, true);
+
+				$data['sheet'] = $sheet;
+			} else  {
+				$data['upload_error'] = $upload['error'];
+			}
+		}
+
+		$data['content'] = 'layouts/siswa/siswa.upload.php';
+		$data['id_kelas'] = $id;
+
+		$this->load->view('main.php', $data, false);
+	}
+
+	public function siswa_import($id)
+	{
+		$excel = new PHPExcel_Reader_Excel2007();
+		$loadExcel = $excel->load('excel/' . $this->filename . '.xlsx');
+		$sheet = $loadExcel->getActiveSheet()->toArray(null, true, true, true);
+
+		$siswa = [];
+
+		$numrow = 1;
+		foreach ($sheet as $row) {
+			if ($numrow > 1) {
+				array_push($siswa, [
+					'id_kelas' => $id,
+					'nis' => $row['A'],
+					'nama' => $row['B'],
+					'jk' => $row['C'],
+					'alamat' => $row['D']
+				]);
+			}
+
+			$numrow++;
+		}
+
+		$this->SiswaModel->insert_multiple($siswa);
+
+		$this->session->set_flashdata('success', 'siswa');
+
+		redirect('/kelas/detail/' . $id);
 	}
 }
 

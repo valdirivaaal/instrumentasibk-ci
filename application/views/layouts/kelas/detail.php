@@ -26,6 +26,8 @@
 					}
 				?>
 
+				<a href="<?php echo base_url("/kelas/siswa_upload/") . $data['kelas']['id']; ?>" class="btn btn-primary float-right"><i class="fa fa-upload"></i> Upload Siswa</a>
+
 				<!-- LIST DATA SISWA -->
 				<div class="adv-table">
 					<table class="display table table-bordered table-striped" id="tableSiswa">
@@ -104,19 +106,34 @@
 					type: "POST",
 					url: url + "siswa/delete/" + id,
 					cache: false,
-					success: function (response) {
-						swal.fire({
-							title: "Terhapus!",
-							text : 'Tunggu beberapa detik atau klik ok.',
-							type : 'success',
-							timer : 3000
-						}, function() {
-							window.location.reload()
-						});
+					success: function (r) {
+						console.log("Delete result", r)
+						console.log('Success', r.success)
 
-						setTimeout(function() {
-							window.location.reload();
-						}, 3000)
+						if (r.success) {
+							swal.fire({
+								title: "Terhapus!",
+								text : 'Data berhasil dihapus. \nTunggu beberapa detik atau klik ok.',
+								type : 'success',
+								timer : 3000
+							}, function() {
+								window.location.reload()
+							});
+
+							setTimeout(function() {
+								window.location.reload();
+							}, 3000)
+
+						} else {
+							swal.fire({
+								title: "Gagal!",
+								text : 'Data siswa gagal dihapus.',
+								type : 'success',
+								timer : 3000
+							}, function() {
+								window.location.reload()
+							});
+						}
 					}
 				})
 			}

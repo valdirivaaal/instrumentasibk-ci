@@ -21,7 +21,7 @@
 				?>
 			</div>
 			<div class="card-body">
-				<form action="<?php echo base_url('siswa/saveEdit'); ?>" method="post" class="form-horizontal">
+				<form action="<?php echo base_url('siswa/editSave'); ?>" method="post" class="form-horizontal">
 					<input type="hidden" name="id" value="<?php echo $data[0]['id'] !== '' ? $data[0]['id'] : ''; ?>">
 					<div class="form-group">
 						<label for="" class="col-lg-12 control-label">NIS</label>
