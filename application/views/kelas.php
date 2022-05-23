@@ -40,7 +40,11 @@
                 <td><?= $value['kelas'] ?></td>
                 <td><?= $value['jumlah_siswa'] ?></td>
                 <td><?= ($get_profil[0]['status']=='Guru BK') ? $value['nama_lengkap'] : $value['jenjang'] ?></td>
-                <td><a href="<?= base_url('kelas/sunting/'.$value['id']) ?>" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i> Ubah</a><button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $value['id'] ?>" data-id="<?= $value['id'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus</button></td>
+                <td>
+										<a href="<?= base_url('kelas/sunting/'.$value['id']) ?>" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i> Ubah</a>
+										<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $value['id'] ?>" data-id="<?= $value['id'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus</button>
+										<a href="<?php echo base_url('kelas/detail/'.$value['id']); ?>" class="btn btn-sm btn-info"><i class="fa fa-file"></i> Daftar Siswa</a>
+								</td>
               </tr> 
               <?php
             }

@@ -97,6 +97,33 @@ class Main_model extends CI_Model {
 		return $query->result_array();
 	}
 
+	public function innerJoin ($table="default",$column="",$table2="",$params="",$sort="",$order="",$limit="",$group_by="", $offset="",$like="")
+	{
+		$table = $table=="default" ? $this->table : $table;
+		$this->db->select($column);
+		$this->db->from($table);
+		foreach ($table2 as $row){
+			$this->db->join($row['table'], $row['parameter'],'inner');
+		}
+
+		if(!empty($params))
+		{
+			$this->db->where($params);	
+		}
+		$this->db->distinct();
+		$this->db->order_by($sort,$order);
+		$this->db->limit($limit, $offset);
+		$this->db->group_by($group_by);
+
+		if ($like) {
+			foreach ($like as $resultLike) {
+				$this->db->like($resultLike['column'], $resultLike['keyword'],$resultLike['method']);
+			}
+		}
+		$query = $this->db->get();
+		return $query->result_array();
+	}
+
 	public function insert_data($table="default",$data="")
 	{
 		$table = $table=="default" ? $this->table : $table;
