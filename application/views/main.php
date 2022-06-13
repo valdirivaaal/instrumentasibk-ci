@@ -32,13 +32,21 @@
 
   <script src="<?= base_url('assets/member/') ?>js/jquery.js"></script>
   <script src="https://kit.fontawesome.com/05a0e1d41d.js" crossorigin="anonymous"></script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/highcharts-more.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 
 
   <style type="text/css">
-  .select2-results__option[aria-selected=true] {
-    display: none;
-  }
-</style>
+		.select2-results__option[aria-selected=true] {
+			display: none;
+		}
+		#sociogram {
+			min-width: 300px !important;
+			max-width: 800px !important;
+			margin: 1em auto;
+		}
+	</style>
 
 </head>
 
