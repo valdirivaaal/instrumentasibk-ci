@@ -3,6 +3,9 @@
   <div class="panel-body bio-graph-info">
     <h1 class="font-weight-bold"> <?= (getField('user_info','status',array('user_id'=>$this->session->userdata('id')))=='Guru BK') ? 'Kelas' : 'Kelompok' ?> Anda</h1>
   </div>
+	<div class="alert alert-info" role="alert">
+		<strong>Halo, <?php echo $get_profil[0]['nama_lengkap'];?>!</strong><br>Kamu dapat menginstruksikan peserta didik untuk melengkapi biodata diri di <a href="<?php echo base_url('siswa/siswa_biodata/' . $this->session->userdata('id')); ?>"><?php echo base_url('siswa/siswa_biodata/' . $this->session->userdata('id')); ?></a>
+	</div>
   <div class="card">
     <div class="card-header">
       Data <?= (getField('user_info','status',array('user_id'=>$this->session->userdata('id')))=='Guru BK') ? 'Kelas' : 'Kelompok' ?>

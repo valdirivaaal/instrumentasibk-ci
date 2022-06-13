@@ -47,6 +47,8 @@
 										<th>Nama</th>
 										<th>Jenis Kelamin</th>
 										<th>Alamat</th>
+										<th>Email</th>
+										<th>No Telepon</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -59,8 +61,10 @@
 											$nama = $row['B'];
 											$jk = $row['C'];
 											$alamat = $row['D'];
+											$email = $row['E'];
+											$telepon = $row['F'];
 
-											if ($nis == '' && $nama = '' && $jk == '' && $alamat == '')
+											if ($nis == '' && $nama == '' && $jk == '' && $alamat == '' && $email == '')
 												continue;
 
 											if ($numrow > 1) {
@@ -68,8 +72,10 @@
 												$namaRow = (!empty($nama)) ? '' : "style='background: #E07171;'";
 												$jkRow = (!empty($jk)) ? '' : "style='background: #E07171;'";
 												$alamatRow = (!empty($alamat)) ? '' : "style='background: #E07171;'";
+												$emailRow = (!empty($email)) ? '' : "style='background: #E07171;'";
+												$teleponRow = (!empty($telepon)) ? '' : "style='background: #E07171;'";
 
-												if ($nis == '' or $nama == '' or $jk == '' or $alamat == '')
+												if ($nis == '' or $nama == '' or $jk == '' or $alamat == '' or $email == '')
 													$kosong++;
 												?>
 													<tr>
@@ -77,6 +83,8 @@
 														<td <?php echo $namaRow; ?>><?php echo $nama; ?></td>
 														<td <?php echo $jkRow; ?>><?php echo $jk; ?></td>
 														<td <?php echo $alamatRow; ?>><?php echo $alamat; ?></td>
+														<td <?php echo $emailRow; ?>><?php echo $email; ?></td>
+														<td <?php echo $teleponRow; ?>><?php echo $telepon; ?></td>
 													</tr>
 												<?php
 											}

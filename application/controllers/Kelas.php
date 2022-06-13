@@ -161,7 +161,7 @@ class Kelas extends CI_Controller {
 		$sheet = $loadExcel->getActiveSheet()->toArray(null, true, true, true);
 
 		$siswa = [];
-
+		// printA($sheet);
 		$numrow = 1;
 		foreach ($sheet as $row) {
 			if ($numrow > 1) {
@@ -176,6 +176,7 @@ class Kelas extends CI_Controller {
 
 			$numrow++;
 		}
+		// printA($siswa);
 
 		$this->SiswaModel->insert_multiple($siswa);
 
