@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -65,3 +65,6 @@ $route['dcm/kode_save'] = 'dcm/kode_save';
 // $route['profil'] = 'profil/index';
 
 $route['translate_uri_dashes'] = FALSE;
+
+// Sosiometri routes
+$route['sosiometri/siswa/(:any)'] = 'sosiometrisiswa/sosiometriSiswaPage/$1';

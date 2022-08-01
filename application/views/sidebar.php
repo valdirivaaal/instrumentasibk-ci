@@ -2,12 +2,6 @@
     <div id="sidebar"  class="nav-collapse ">
       <!-- sidebar menu start-->
       <ul class="sidebar-menu" id="nav-accordion">
-				<li>
-					<a href="<?= base_url('sociograph') ?>">
-						<i class="fa fa-project-diagram"></i>
-						<span>Sociograph</span>
-					</a>
-				</li>
         <li>
           <a class="<?= (getController()=='dashboard') ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
             <i class="fa fa-dashboard"></i>
@@ -59,7 +53,7 @@
         if (getField('user_info','status',array('user_id'=>$this->session->userdata('id')))=='Guru BK') {
           ?>
           <li class="sub-menu">
-            <a href="javascript:;" class="<?= (getController()=='aum' || getController()=='ptsdl' || getController()=='auap' || getController()=='dcm') ? 'active' : '' ?>" >
+            <a href="javascript:;" class="<?= (getController()=='aum' || getController()=='ptsdl' || getController()=='auap' || getController()=='dcm' || getController()=='sosiometri') ? 'active' : '' ?>" >
               <i class="fa fa-laptop"></i>
               <span>Instrumen</span>
             </a>
@@ -68,6 +62,7 @@
               <li class="<?= (getController()=='ptsdl') ? 'active' : '' ?>"><a href="<?= base_url('ptsdl') ?>">AUM PTSDL</a></li>
               <li class="<?= (getController()=='auap') ? 'active' : '' ?>"><a href="<?= base_url('auap') ?>">AU-AP</a></li>
               <li class="<?= (getController()=='dcm') ? 'active' : '' ?>"><a href="<?= base_url('dcm') ?>">DCM</a></li>
+              <li class="<?= (getController()=='sosiometri') ? 'active' : '' ?>"><a href="<?= base_url('sosiometri') ?>">Sosiometri</a></li>
             </ul>
           </li>
           <?php
