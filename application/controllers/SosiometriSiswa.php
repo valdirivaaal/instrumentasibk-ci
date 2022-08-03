@@ -12,25 +12,8 @@ class SosiometriSiswa extends CI_Controller
 
 	public function sosiometriSiswaPage($code)
 	{
-		// Get list kelas
-		$kelas = $this->Main_model->join(
-			'kelas',
-			'*,kelas.id as id',
-			array(
-				array(
-					'table' => 'user_konselor',
-					'parameter' => 'user_konselor.id=kelas.konselor_id'
-				)
-			),
-			array(
-				'kelas.user_id' => $this->session->userdata('id')
-			),
-			'kelas',
-			'asc'
-		);
 
 		// Get config
-		// $config = $this->Main_model->get_where('sosiometri', ['url' => $code]);
 		$config = $this->Main_model->join(
 			'sosiometri',
 			'*, sosiometri_pertanyaan.pertanyaan as pertanyaan',
@@ -44,6 +27,23 @@ class SosiometriSiswa extends CI_Controller
 				'sosiometri.url' => $code
 			],
 			'sosiometri.id',
+			'asc'
+		);
+
+		// Get list kelas
+		$kelas = $this->Main_model->join(
+			'kelas',
+			'*,kelas.id as id',
+			[
+				[
+					'table' => 'user_konselor',
+					'parameter' => 'user_konselor.id=kelas.konselor_id'
+				]
+			],
+			[
+				'kelas.user_id' => $config[0]['user_id']
+			],
+			'kelas',
 			'asc'
 		);
 

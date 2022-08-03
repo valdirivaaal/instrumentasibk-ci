@@ -1,5 +1,6 @@
 <?php
 // printA($config);
+// printA($kelas);
 ?>
 <div class="row mt-5">
 	<div class="col-md-12">
@@ -58,7 +59,7 @@
 					<div class="form-group">
 						<label for="pilihan" class="col-lg-12 control-label">Siapakah orang yang paling tidak sesuai dengan pertanyaan diatas?</label>
 						<div class="col-lg-12">
-							<select name="pilihan_negatif" id="pilihan_negatif" class="form-control" disabled required></select>
+							<select name="pilihan_negatif" id="pilihan_negatif" class="form-control" disabled></select>
 						</div>
 					</div>
 					<div class="form-group">
@@ -184,7 +185,7 @@
 					// console.log('Data siswa', resp)
 
 					if (resp.success) {
-						var optionTemp = '<option value="">--PILIH NAMA SISWA--</option>';
+						var optionTemp = selector == 'pilihan_negatif' ? '<option value="">--TIDAK ADA--</option>' : '<option value="">--PILIH NAMA SISWA--</option>';
 
 						$.each(resp.data, function(i, v) {
 							optionTemp += '<option value="' + v.id + '">' + v.nama + '</option>'
