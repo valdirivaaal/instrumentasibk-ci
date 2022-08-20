@@ -575,6 +575,13 @@ if ( ! function_exists('input_radio'))
 	}
 }
 
+function printA($data)
+{
+	echo "<pre>";
+	print_r($data);
+	echo "</pre>";
+	die();
+}
 
 function hash_password($string)
 {
