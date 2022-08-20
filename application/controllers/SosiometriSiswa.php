@@ -116,7 +116,40 @@ class SosiometriSiswa extends CI_Controller
 	public function angketSiswa()
 	{
 		$req = $this->input->post();
-
 		printA($req);
+
+		$isResponded = $this->Main_model->get_where(
+			'sosiometri_respon',
+			[
+				'id_sosiometri' => $req['id_sosiometri'],
+				'id_siswa' => $req['id_siswa']
+			]
+		);
+
+		if (!$isResponded) {
+			// Restructuring data
+			$data = [
+				'id_sosiometri' => $req['id_sosiometri'],
+				'id_siswa' => $req['id_siswa'],
+				'pilihan' => serialize($req['pilihan']),
+				'pilihan_negatif' => $req['pilihan_negatif']
+			];
+
+			// Insert new record
+			$this->Main_model->insert_data('sosiometri_respon', $data);
+			$this->session->set_flashdata('success', 'angket');
+		} else {
+			// Restructuring data
+			$data = [
+				'id_sosiometri' => $req['id_sosiometri'],
+				'id_siswa' => $req['id_siswa'],
+				'pilihan' => serialize($req['pilihan']),
+				'pilihan_negatif' => $req['pilihan_negatif']
+			];
+
+			// Update existing record
+			$this->Main_model->update_data('sosiometri_respon', $req, ['id' => $isResponded['id']]);
+			$this->session->set_flashdata('success', 'angket');
+		}
 	}
 }
