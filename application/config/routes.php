@@ -79,4 +79,7 @@ $route['logo/hapus/(:num)']['post'] = 'admin/logohapus/$1';
 $route['admin/key/(:any)'] = 'admin/keyEdit/$1';
 $route['admin/key']['POST'] = 'admin/keyProses';
 
+$route['admin/user/edit/(:num)']['get'] = 'admin/userEdit/$1';
+$route['admin/user/edit/(:num)']['POST'] = 'admin/userEditProses/$1';
+
 $route['hapus'] = 'hapus/index';

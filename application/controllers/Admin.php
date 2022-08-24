@@ -8,6 +8,7 @@ class Admin extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 
 		$get_user = $this->Main_model->get_where('user_info', [
 			'user_id' => $this->session->userdata('id')
@@ -113,10 +114,29 @@ class Admin extends CI_Controller
 
 	public function user()
 	{
-		$data['get_user'] = $this->Main_model->join('ticket', '*,ticket.date_created as date_created,user_info.status as status', array(array('table' => 'user_info', 'parameter' => 'ticket.user_id=user_info.user_id'), array('table' => 'event_key', 'parameter' => 'ticket.event_key=event_key.id')), array('tgl_kadaluarsa >=' => date('Y-m-d')));
+		$data['get_user'] = $this->Main_model->join('user_info', '*', [['table' => 'user', 'parameter' => 'user_info.user_id = user.id']]);
 		$data['content'] = 'admin/user';
 
 		$this->load->view('admin/main.php', $data, FALSE);
+	}
+
+	public function userEdit($id)
+	{
+		$data['get_user'] = $this->Main_model->join('user_info', '*', [['table' => 'user', 'parameter' => 'user_info.user_id = user.id']], ['user_info.user_id =' => $id]);
+		$data['get_ticket'] = $this->GetModel->getLastTicket($id);
+		$data['content'] = 'admin/user-edit';
+
+		$this->load->view('admin/main.php', $data, FALSE);
+	}
+
+	public function userEditProses($id)
+	{
+		$post = $this->input->post();
+		$this->Main_model->update_data('user_info', $post, [
+			'user_id' => $id
+		]);
+		$this->session->set_flashdata('success', 'User');
+		redirect('admin/user');
 	}
 
 	public function key_available()

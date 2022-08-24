@@ -72,10 +72,9 @@ class Dcm extends CI_Controller
 
 	public function index($jenjang = "")
 	{
-		// $this->load->library('encrypt');
 		$this->load->library('encryption');
 
-		$get_ticket = $this->Main_model->join('ticket', '*', array(array('table' => 'event_key', 'parameter' => 'ticket.event_key=event_key.id')), array('ticket.user_id' => $this->session->userdata('id'), 'event_key.tipe' => 3));
+		$get_ticket = $this->Main_model->join('ticket', '*', array(array('table' => 'event_key', 'parameter' => 'ticket.event_key=event_key.id')), array('ticket.user_id' => $this->session->userdata('id'), 'event_key.tipe' => 3), 'ticket.id', 'DESC');
 		$data['get_profil'] = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 
 
@@ -85,6 +84,7 @@ class Dcm extends CI_Controller
 			$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'DCM', 'jenjang' => $data['get_profil'][0]['jenjang']));
 		}
 
+		$day_remaining = 0;
 
 		$data['get_kelompok'] = $this->Main_model->get_where('kelompok', array('user_id' => $this->session->userdata('id')));
 
@@ -95,6 +95,7 @@ class Dcm extends CI_Controller
 		$data['jenjang'] =  $jenjang;
 
 		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 			if ($jenjang) {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id'), 'jenjang' => $jenjang), 'kelas', 'asc');
 			} else {
@@ -105,6 +106,10 @@ class Dcm extends CI_Controller
 			$data['content'] = 'key_dcm';
 		}
 
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key_dcm';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -198,6 +203,8 @@ class Dcm extends CI_Controller
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		// if(!$get_user || !)
+
 		$total_peserta = 0;
 		foreach ($get_kelas as $key => $value) {
 			$total_peserta += $value['jumlah_siswa'];
@@ -242,15 +249,15 @@ class Dcm extends CI_Controller
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
 		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kanan']), 170, 10, 35, 27);
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kanan'], 170, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_adebk.jpeg'), 170, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_adebk.jpeg', 170, 6, 30, 27);
 		}
 		$pdf->Ln(1);
 		$pdf->Cell(205, 6, strtoupper(@$get_surat[0]['baris_pertama']), 0, 0, 'C');
@@ -290,7 +297,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN PELAJARAN 2022/2023', 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -766,6 +773,7 @@ class Dcm extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(10, 90, 50, 20));
+
 		srand(microtime() * 1000000);
 
 		arsort($sumArray);
@@ -867,15 +875,15 @@ class Dcm extends CI_Controller
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
 		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kanan']), 170, 10, 35, 27);
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kanan'], 170, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_adebk.jpeg'), 170, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_adebk.jpeg', 170, 6, 30, 27);
 		}
 		$pdf->Ln(1);
 		$pdf->Cell(205, 6, strtoupper(@$get_surat[0]['baris_pertama']), 0, 0, 'C');
@@ -912,7 +920,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN PELAJARAN 2022/2023', 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1108,10 +1116,10 @@ class Dcm extends CI_Controller
 		$chartYStep = 100;
 
 		$chartColours = array(
-			array(255, 100, 100),
-			array(100, 255, 100),
 			array(100, 100, 255),
+			array(255, 100, 100),
 			array(255, 255, 100),
+			array(100, 100, 100),
 		);
 
 		$data = array(
@@ -1386,7 +1394,7 @@ class Dcm extends CI_Controller
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->Cell(35, 7, 'C. 10 Butir Pernyataan Populer', 0, 1, 'L');
 		$pdf->SetWidths(array(10, 90, 50, 20));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->Cell(8, 7, '', 0, 0, 'L');
 		$pdf->SetAligns(array('C', 'C', 'C', 'C'));
 		$pdf->Row(array('No', 'Pernyataan', 'Bidang', '%'));
@@ -1467,15 +1475,15 @@ class Dcm extends CI_Controller
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
 		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kanan']), 170, 10, 35, 27);
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kanan'], 170, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_adebk.jpeg'), 170, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_adebk.jpeg', 170, 6, 30, 27);
 		}
 		$pdf->Ln(1);
 		$pdf->Cell(205, 6, strtoupper(@$get_surat[0]['baris_pertama']), 0, 0, 'C');
@@ -1524,7 +1532,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN PELAJARAN 2022/2023', 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1556,7 +1564,7 @@ class Dcm extends CI_Controller
 
 		$i = 0;
 		foreach ($get_aspek as $value_aspek) {
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = [];
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
 			foreach ($get_butir as $key => $value) {
 				if (isset($jawaban[$value['id']])) {
@@ -1564,7 +1572,7 @@ class Dcm extends CI_Controller
 				}
 			}
 
-			$skor_masalah[] = count(@$array_no_masalah[$value_aspek['kode_aspek']]);
+			$skor_masalah[] = count($array_no_masalah[$value_aspek['kode_aspek']]);
 			$persentase_masalah[$i]['persentase'] = round((count(@$array_no_masalah[$value_aspek['kode_aspek']]) / count($get_butir)) * 100, 2);
 			$persentase_masalah[$i]['aspek'] = $value_aspek['aspek'];
 			$persentase_masalah[$i++]['jumlah_skor'] = count(@$array_no_masalah[$value_aspek['kode_aspek']]);
@@ -1757,11 +1765,32 @@ class Dcm extends CI_Controller
 		$chartHeight = 80;
 		$chartYStep = 100;
 
+
+		// $col1 = array(100, 100, 255);
+		// $col2 = array(255, 100, 100);
+		// $col3 = array(255, 255, 100);
+		// $col4 = array(100, 100, 100);
+
+		// $chartColours = array(
+		// 	array(255, 100, 100),
+		// 	array(100, 255, 100),
+		// 	array(100, 100, 255),
+		// 	array(255, 255, 100),
+		// );
+
 		$chartColours = array(
-			array(255, 100, 100),
-			array(100, 255, 100),
-			array(100, 100, 255),
-			array(255, 255, 100),
+			array(100, 100, 255), //aspek 1
+			array(100, 100, 255), //aspek 2
+			array(100, 100, 255), //aspek 3
+			array(255, 100, 100), //aspek 4
+			array(100, 100, 255), //aspek 5
+			array(255, 100, 100), //aspek 6
+			array(255, 100, 100), //aspek 7
+			array(100, 100, 255), //aspek 8
+			array(255, 255, 100), //aspek 9
+			array(100, 100, 100), //aspek 10
+			array(255, 255, 100), //aspek 11
+
 		);
 
 		$data = array(
@@ -2285,7 +2314,7 @@ class Dcm extends CI_Controller
 
 		$x = 'a';
 		foreach ($get_aspek as $value_aspek) {
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = [];
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
 
 			foreach ($get_butir as $key => $value) {

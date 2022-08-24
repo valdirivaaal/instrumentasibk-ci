@@ -84,9 +84,9 @@ class Main_model extends CI_Model
 			$this->db->where($params);
 		}
 		$this->db->distinct();
+		$this->db->group_by($group_by);
 		$this->db->order_by($sort, $order);
 		$this->db->limit($limit, $offset);
-		$this->db->group_by($group_by);
 
 		if ($like) {
 			foreach ($like as $resultLike) {
