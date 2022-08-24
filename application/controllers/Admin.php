@@ -139,6 +139,11 @@ class Admin extends CI_Controller
 		redirect('admin/user');
 	}
 
+	public function narasumber()
+	{
+		$data['get_narsum'] = $this->Main_model->get();
+	}
+
 	public function key_available()
 	{
 		$data['get_key_guru'] = $this->Main_model->get_where('event_key', array('status' => 'Inactive', 'tipe' => 1));
