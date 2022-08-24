@@ -68,3 +68,15 @@ $route['translate_uri_dashes'] = FALSE;
 
 // Sosiometri routes
 $route['sosiometri/siswa/(:any)'] = 'sosiometrisiswa/sosiometriSiswaPage/$1';
+
+$route['admin'] = 'admin/dashboard';
+
+$route['logo/tambah'] = 'admin/tambahlogo';
+$route['logo/edit/(:num)']['get'] = 'admin/logoedit/$1';
+$route['logo/edit/(:num)']['post'] = 'admin/logoeditaction/$1';
+$route['logo/hapus/(:num)']['post'] = 'admin/logohapus/$1';
+
+$route['admin/key/(:any)'] = 'admin/keyEdit/$1';
+$route['admin/key']['POST'] = 'admin/keyProses';
+
+$route['hapus'] = 'hapus/index';
