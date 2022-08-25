@@ -26,6 +26,10 @@ class Hapus extends CI_Controller
 
 		if ($tipe == 'user_admin') {
 			$this->HapusUser($kelompok);
+		} else if ($tipe == 'narasumber') {
+			$this->HapusJawaban($kelompok);
+		} else if ($tipe == 'eventkey') {
+			$this->HapusEventkey($kelompok);
 		} else {
 			return redirect('dashboard');
 		}
@@ -48,6 +52,45 @@ class Hapus extends CI_Controller
 			$this->Main_model->delete_data('user_info', array('user_id' => $id));
 			$this->Main_model->delete_data('user', array('id' => $id));
 			redirect('admin/user');
+		}
+	}
+
+	protected function HapusJawaban($id)
+	{
+		$get_user = $this->Main_model->get_where('user_info', [
+			'user_id' => $this->session->userdata('id')
+		]);
+
+		if ($get_user[0]['level'] != 'admin') {
+			$this->output->set_status_header(401);
+			redirect(base_url() . 'dashboard');
+		}
+
+		if (!$id) {
+			return redirect('dashboard');
+		} else {
+			$this->Main_model->delete_data('instrumen_jawaban', array('id' => $id));
+			redirect('admin/user');
+		}
+	}
+
+	protected function HapusEventkey($id)
+	{
+		$get_user = $this->Main_model->get_where('user_info', [
+			'user_id' => $this->session->userdata('id')
+		]);
+
+		if ($get_user[0]['level'] != 'admin') {
+			$this->output->set_status_header(401);
+			redirect(base_url() . 'dashboard');
+		}
+
+		if (!$id) {
+			return redirect('dashboard');
+		} else {
+			$this->Main_model->delete_data('event_key', array('id' => $id));
+			$this->session->set_flashdata('success', 'hapus');
+			redirect('admin/key_available');
 		}
 	}
 }

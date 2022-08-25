@@ -82,4 +82,7 @@ $route['admin/key']['POST'] = 'admin/keyProses';
 $route['admin/user/edit/(:num)']['get'] = 'admin/userEdit/$1';
 $route['admin/user/edit/(:num)']['POST'] = 'admin/userEditProses/$1';
 
+$route['admin/narasumber/edit/(:num)']['get'] = 'admin/NarasumberEdit/$1';
+$route['admin/narasumber/edit/(:num)']['POST'] = 'admin/NarasumberEditProses/$1';
+
 $route['hapus'] = 'hapus/index';

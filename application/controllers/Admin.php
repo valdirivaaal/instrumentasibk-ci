@@ -141,7 +141,53 @@ class Admin extends CI_Controller
 
 	public function narasumber()
 	{
-		$data['get_narsum'] = $this->Main_model->get();
+		$data['get_narsum'] = $this->Main_model->join('instrumen_jawaban', '*,instrumen_jawaban.id as id_narasumber,instrumen_jawaban.email as email_narasumber,instrumen_jawaban.nama_lengkap as nama_narasumber,instrumen.jenjang as jenjang_instrumen', [[
+			'table' => 'user_instrumen',
+			'parameter' => 'instrumen_jawaban.instrumen_id = user_instrumen.id'
+		], [
+			'table' => 'instrumen',
+			'parameter' => 'user_instrumen.instrumen_id = instrumen.id'
+		], [
+			'table' => 'kelas',
+			'parameter' => 'instrumen_jawaban.kelas = kelas.id'
+		], [
+			'table' => 'user_info',
+			'parameter' => 'kelas.user_id = user_info.user_id'
+		], [
+			'table' => 'user_konselor',
+			'parameter' => 'kelas.konselor_id = user_konselor.id'
+		]]);
+
+		$data['content'] = 'admin/narasumber';
+
+		$this->load->view('admin/main.php', $data, FALSE);
+	}
+
+	public function NarasumberEdit($id)
+	{
+		$data['get_narsum'] = $this->Main_model->join('instrumen_jawaban', '*,instrumen_jawaban.email as email_narasumber,instrumen_jawaban.nama_lengkap as nama_narasumber,instrumen.jenjang as jenjang_instrumen', [[
+			'table' => 'user_instrumen',
+			'parameter' => 'instrumen_jawaban.instrumen_id = user_instrumen.id'
+		], [
+			'table' => 'instrumen',
+			'parameter' => 'user_instrumen.instrumen_id = instrumen.id'
+		], [
+			'table' => 'kelas',
+			'parameter' => 'instrumen_jawaban.kelas = kelas.id'
+		], [
+			'table' => 'user_info',
+			'parameter' => 'kelas.user_id = user_info.user_id'
+		], [
+			'table' => 'user_konselor',
+			'parameter' => 'kelas.konselor_id = user_konselor.id'
+		]], [
+			'instrumen_jawaban.id ' => $id
+		]);
+
+		$data['content'] = 'admin/narasumber-edit';
+
+
+		$this->load->view('admin/main.php', $data, FALSE);
 	}
 
 	public function key_available()
@@ -166,6 +212,68 @@ class Admin extends CI_Controller
 		$data['state'] = 'used';
 
 		$this->load->view('admin/main.php', $data, FALSE);
+	}
+
+	public function keygen()
+	{
+		$data['content'] = 'admin/keygen';
+
+		$this->load->view('admin/main', $data, FALSE);
+	}
+
+	public function keygenProses()
+	{
+		$post = $this->input->post();
+
+		$jumlah = $post['jumlah'];
+		$length = $post['panjang'];
+		$masa_berlaku = !$post['masa_berlaku'] ? 365 : $post['masa_berlaku'];
+		$key = [];
+
+		if (!$jumlah) {
+			$this->session->set_flashdata('error', 'Jumlah Harus diisi');
+			redirect('admin/keygen');
+		}
+
+		$data = [
+			'masa_berlaku' => $masa_berlaku,
+			'status' => 'Inactive',
+			'tipe' => $post['tipe']
+		];
+
+		if (!$length) {
+			$length = 6;
+		}
+
+		for ($i = 0; $i < $jumlah; $i++) {
+			$tempKey = $this->GenerateKey($length);
+			$query = $this->Main_model->get_where('event_key', [
+				'event_key' => $tempKey
+			]);
+
+			if (!empty($query)) {
+				$i--;
+				continue;
+			} else {
+				$key[] = $tempKey;
+				$data['event_key'] = $tempKey;
+				$this->Main_model->insert_data('event_key', $data);
+			}
+		}
+
+		$this->session->set_flashdata('success_key', $key);
+		redirect('admin/key_available');
+	}
+
+	protected function GenerateKey($length): string
+	{
+		$tempKey = '';
+		$char = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		for ($j = 0; $j < $length; $j++) {
+			$tempKey .= $char[rand(0, strlen($char) - 1)];
+		}
+
+		return $tempKey;
 	}
 
 	public function logo()

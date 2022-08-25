@@ -11,6 +11,7 @@ class Aum extends CI_Controller
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
+		ini_set('memory_limit', '8192M');
 	}
 
 	public function GenerateWord()
@@ -1352,7 +1353,7 @@ class Aum extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(10, 45, 50, 15, 15, 37));
 		$pdf->SetAligns(array('C', 'L', 'L', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$i = 1;
 
 		foreach ($get_aspek as $value_aspek) {
@@ -1390,7 +1391,7 @@ class Aum extends CI_Controller
 			$pdf->Ln(8);
 			$pdf->Cell(6, 7, '', 0, 0, 'L');
 			$pdf->SetWidths(array(20, 121, 30));
-			srand(microtime() * 1000000);
+			// srand(microtime() * 1000000);
 			$pdf->SetAligns(array('C', 'C', 'C', 'C'));
 			$pdf->Row(array('No Item', 'Pernyataan', 'Bidang'));
 			$pdf->SetFont('Arial', '', 12);

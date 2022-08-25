@@ -1793,6 +1793,21 @@ class Dcm extends CI_Controller
 
 		);
 
+		$chartAspect = array(
+			'Pribadi', //aspek 1
+			'Pribadi', //aspek 2
+			'Pribadi', //aspek 3
+			'Sosial', //aspek 4
+			'Pribadi', //aspek 5
+			'Sosial', //aspek 6
+			'Sosial', //aspek 7
+			'Pribadi', //aspek 8
+			'Belajar', //aspek 9
+			'Karir', //aspek 10
+			'Belajar', //aspek 11
+
+		);
+
 		$data = array(
 			array($persentase_masalah[0]['persentase']),
 			array($persentase_masalah[1]['persentase']),
@@ -1838,6 +1853,8 @@ class Dcm extends CI_Controller
 
 		for ($i = 0; $i < count($rowLabels); $i++) {
 			$pdf->SetXY($chartXPos + 40 +  $i / $xScale, $chartYPos);
+			$pdf->Cell($barWidth, 10, $chartAspect[$i], 0, 0, 'C');
+			$pdf->SetXY($chartXPos + 40 +  $i / $xScale, $chartYPos + 3);
 			$pdf->Cell($barWidth, 10, $rowLabels[$i], 0, 0, 'C');
 		}
 
@@ -1866,6 +1883,8 @@ class Dcm extends CI_Controller
 			$colourIndex = $bar % count($chartColours);
 			$pdf->SetFillColor($chartColours[$colourIndex][0], $chartColours[$colourIndex][1], $chartColours[$colourIndex][2]);
 			$pdf->Rect($xPos, $chartYPos - ($totalSales / $yScale), $barWidth, $totalSales / $yScale, 'DF');
+			// // $pdf->SetXY($xPos, $chartYPos - ($totalSales / $yScale) - 5);
+			// $pdf->Cell($barWidth, 0, $chartAspect[$colourIndex], 0, 0, 'C');
 			$xPos += (1 / $xScale);
 			$bar++;
 		}
