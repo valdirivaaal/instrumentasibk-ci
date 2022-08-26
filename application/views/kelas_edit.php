@@ -1,7 +1,7 @@
  <div class="row">
  	<div class="col-md-12">
  		<div class="panel-body bio-graph-info">
- 			<h1 class="font-weight-bold"> <?= (getField('user_info','status',array('user_id'=>$this->session->userdata('id')))=='Guru BK') ? 'Kelas' : 'Kelompok' ?></h1>
+ 			<h1 class="font-weight-bold"> <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></h1>
  		</div>
  		<div class="card">
  			<div class="card-header">
@@ -11,7 +11,7 @@
  				<form class="form-horizontal" role="form" action="<?= base_url('kelas/save') ?>" method="post">
  					<input type="hidden" name="id" value="<?= (isset($get_kelas[0]['id'])) ? $get_kelas[0]['id'] : '' ?>">
  					<div class="form-group">
- 						<label  class="col-lg-12 control-label"><?= (getField('user_info','status',array('user_id'=>$this->session->userdata('id')))=='Guru BK') ? 'Kelas' : 'Kelompok' ?></label>
+ 						<label class="col-lg-12 control-label"><?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></label>
  						<div class="col-md-12">
  							<div class="form-group">
  								<input type="text" class="form-control" name="kelas" placeholder="Kelas" value="<?= (isset($get_kelas[0]['kelas'])) ? $get_kelas[0]['kelas'] : '' ?>" required>
@@ -19,7 +19,7 @@
  						</div>
  					</div>
  					<div class="form-group">
- 						<label  class="col-lg-12 control-label">Jumlah Siswa</label>
+ 						<label class="col-lg-12 control-label">Jumlah Siswa</label>
  						<div class="col-md-12">
  							<div class="form-group">
  								<input type="number" class="form-control" name="jumlah_siswa" placeholder="Jumlah siswa" value="<?= (isset($get_kelas[0]['jumlah_siswa'])) ? $get_kelas[0]['jumlah_siswa'] : '' ?>" required>
@@ -27,47 +27,52 @@
  						</div>
  					</div>
 
- 					<?php
- 					if (getField('user_info','status',array('user_id'=>$this->session->userdata('id')))=='Guru BK') {
- 						?>
- 						<div class="form-group">
- 							<label  class="col-lg-12 control-label">Guru BK</label>
- 							<div class="col-md-12">
- 								<div class="form-group">
- 									<select class="form-control" name="konselor_id" required>
- 										<option value="">Pilih guru BK</option>
- 										<?php
- 										foreach ($get_konselor as $key => $value) {
- 											?>
- 											<option value="<?= $value['id'] ?>" <?= (@$get_kelas[0]['konselor_id']==$value['id']) ? 'selected' : '' ?>><?= $value['nama_lengkap'] ?></option>
- 											<?php
- 										}
- 										?>
- 									</select>
- 								</div>
+ 					<div class="form-group">
+ 						<label class="col-lg-12 control-label"><?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Guru BK' : 'Konselor' ?></label>
+ 						<div class="col-md-12">
+ 							<div class="form-group">
+ 								<select class="form-control" name="konselor_id" required>
+ 									<option value="">Pilih <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Guru BK' : 'Konselor' ?></option>
+ 									<?php
+										foreach ($get_konselor as $key => $value) {
+										?>
+ 										<option value="<?= $value['id'] ?>" <?= (@$get_kelas[0]['konselor_id'] == $value['id']) ? 'selected' : '' ?>><?= $value['nama_lengkap'] ?></option>
+ 									<?php
+										}
+										?>
+ 								</select>
  							</div>
  						</div>
- 						<?php
- 					} else {
- 						?>
+ 					</div>
+ 					<?php
+						if (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) != 'Guru BK') {
+						?>
  						<div class="form-group">
- 							<label  class="col-lg-12 control-label">Jenjang</label>
+ 							<label class="col-lg-12 control-label">Jenjang</label>
  							<div class="col-md-12">
  								<div class="form-group">
  									<select class="form-control" name="jenjang" required>
  										<option value="" selected>Pilih jenjang kelas</option>
- 										<option value="SD">SD</option>
- 										<option value="SMP">SMP</option>
- 										<option value="SMA">SMA</option>
- 										<option value="PT">Perguruan Tinggi</option>
- 										<option value="Umum">UMUM</option>
+ 										<option value="SD" <?= $get_kelas[0]['jenjang'] == 'SD' ? 'selected' : '' ?>>SD</option>
+ 										<option value="SMP" <?= $get_kelas[0]['jenjang'] == 'SMP' ? 'selected' : '' ?>>SMP</option>
+ 										<option value="SMA" <?= $get_kelas[0]['jenjang'] == 'SMA' ? 'selected' : '' ?>>SMA</option>
+ 										<option value="PT" <?= $get_kelas[0]['jenjang'] == 'PT' ? 'selected' : '' ?>>Perguruan Tinggi</option>
+ 										<option value="Umum" <?= $get_kelas[0]['jenjang'] == 'Umum' ? 'selected' : '' ?>>UMUM</option>
  									</select>
  								</div>
  							</div>
  						</div>
- 						<?php
- 					}
- 					?>
+ 					<?php
+						}
+						?>
+ 					<div class="form-group">
+ 						<label class="col-lg-12 control-label">Tahun Ajaran</label>
+ 						<div class="col-lg-12">
+ 							<input type="text" placeholder="yyyy/yyyy" data-mask="9999/9999" class="form-control" name="tahun_ajaran" value="<?= !isset($get_kelas[0]['tahun_ajaran']) ? '' : $get_kelas[0]['tahun_ajaran']  ?>">
+ 							<span class="help-inline">Format : yyyy/yyyy</span><br>
+ 							<span class="help-inline">Contoh : <?= $this->Main_model->getTahunAjaran() ?></span>
+ 						</div>
+ 					</div>
  					<div class="form-group-append">
  					</div>
  					<div class="form-group">
