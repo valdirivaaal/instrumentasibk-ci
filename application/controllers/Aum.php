@@ -8,6 +8,7 @@ class Aum extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
@@ -38,7 +39,7 @@ class Aum extends CI_Controller
 	{
 		// $this->load->library('encrypt');
 		$this->load->library('encryption');
-		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')));
+		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')), 'id', 'DESC', 1);
 		$data['get_profil'] = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 
 		if ($jenjang) {
@@ -56,7 +57,10 @@ class Aum extends CI_Controller
 
 		$data['jenjang'] =  $jenjang;
 
+		$day_remaining = 0;
+
 		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 			if ($jenjang) {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id'), 'jenjang' => $jenjang), 'kelas', 'asc');
 			} else {
@@ -67,7 +71,10 @@ class Aum extends CI_Controller
 			$data['content'] = 'key';
 		}
 
+		if ($day_remaining <= 0) {
 
+			$data['content'] = 'key';
+		}
 		$this->load->view('main.php', $data, FALSE);
 	}
 
@@ -92,7 +99,21 @@ class Aum extends CI_Controller
 		$get_aum = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_aum[0]['id'], 'kelas' => $id));
-		$data['content'] = 'aum_detail.php';
+
+		$get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
+		$day_remaining = 0;
+
+		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+			$data['content'] = 'aum_detail.php';
+		} else {
+			$data['content'] = 'key';
+		}
+
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -164,6 +185,12 @@ class Aum extends CI_Controller
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
 
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
@@ -277,7 +304,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -652,6 +679,12 @@ class Aum extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
 			if (!$get_data_logo) {
@@ -762,7 +795,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1128,6 +1161,11 @@ class Aum extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $get_profil[0]['kelas']));
 		$get_user = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
+
+		if (!$get_profil) {
+			show_error('Error When Fetch data', 500);
+		}
+
 		if ($get_user[0]['jenjang'] == 'Konselor') {
 			$get_kelas = $this->Main_model->get_where('kelas', array('id' => $get_profil[0]['kelas']));
 			$get_user[0]['jenjang'] = $get_kelas[0]['jenjang'];
@@ -1147,6 +1185,8 @@ class Aum extends CI_Controller
 		$jawaban = unserialize($get_profil[0]['jawaban']);
 		$jawaban_berat = unserialize($get_profil[0]['jawaban_berat']);
 		$jawaban_deskriptif = unserialize($get_profil[0]['jawaban_deskriptif']);
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
 
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
@@ -1204,7 +1244,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);

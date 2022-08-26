@@ -8,6 +8,7 @@ class Dcm extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
@@ -106,16 +107,18 @@ class Dcm extends CI_Controller
 			$data['content'] = 'key_dcm';
 		}
 
-		// if ($day_remaining <= 0) {
+		if ($day_remaining <= 0) {
 
-		// 	$data['content'] = 'key_dcm';
-		// }
+			$data['content'] = 'key_dcm';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
 
 	public function view($id = "")
 	{
+
+
 		$data['get_profil'] = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 		$data['id'] = $id;
 		if ($data['get_profil'][0]['jenjang'] == 'SMA') {
@@ -132,7 +135,24 @@ class Dcm extends CI_Controller
 
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_dcm[0]['id'], 'kelas' => $id));
 		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
-		$data['content'] = 'dcm_detail.php';
+
+
+		$get_ticket = $this->Main_model->join('ticket', '*', array(array('table' => 'event_key', 'parameter' => 'ticket.event_key=event_key.id')), array('ticket.user_id' => $this->session->userdata('id'), 'event_key.tipe' => 3), 'ticket.id', 'DESC');
+		$day_remaining = 0;
+
+		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+			$data['content'] = 'dcm_detail.php';
+		} else {
+			$data['content'] = 'key_dcm';
+		}
+
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key_dcm';
+		}
+
+		// $data['content'] = 'dcm_detail.php';
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -204,6 +224,8 @@ class Dcm extends CI_Controller
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
 
 		// if (!$get_user || !$get_instrumen || !$get_kode || !$get_kelompok || !$get_data || !$get_surat || !$get_kelas || !$get_aspek) {
 		// 	show_error('Error When Fetch data', 500);
@@ -340,7 +362,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN PELAJARAN 2022/2023', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN PELAJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -919,6 +941,8 @@ class Dcm extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
 		if (!$get_data) {
 			show_error('Error When Fetch data', 500);
 		}
@@ -1033,7 +1057,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN PELAJARAN 2022/2023', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN PELAJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1608,6 +1632,8 @@ class Dcm extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'DCM', 'jenjang' => $get_user[0]['jenjang']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
 		if (!$get_profil) {
 			show_error('Error When Fetch data', 500);
 		}
@@ -1688,7 +1714,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN PELAJARAN 2022/2023', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN PELAJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);

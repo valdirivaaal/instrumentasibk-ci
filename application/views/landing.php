@@ -61,6 +61,12 @@
 					</div>
 				</div>
 			</div>
+			<?php if ((getField('pengumuman', 'status', array('id' => 1)) == 'show')) { ?>
+				<div class="alert alert-info mt-3" role="alert">
+					<small class="alert-heading mt-0"><?= getField('pengumuman', 'tanggal', array('id' => 1)) ?></small><br>
+					<h5><?= getField('pengumuman', 'pesan', array('id' => 1)) ?></h5>
+				</div>
+			<?php } ?>
 		</div>
 		<div class="footer">Copyright © 2022 Instrumentasi BK</div>
 	</section>

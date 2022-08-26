@@ -8,6 +8,7 @@ class Ptsdl extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
@@ -33,7 +34,9 @@ class Ptsdl extends CI_Controller
 
 		$data['jenjang'] =  $jenjang;
 
-		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')));
+		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')), 'id', 'DESC', 1);
+
+		$day_remaining = 0;
 
 		if ($get_ticket) {
 			if ($jenjang) {
@@ -41,11 +44,16 @@ class Ptsdl extends CI_Controller
 			} else {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id')), 'kelas', 'asc');
 			}
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 			$data['content'] = 'aum_ptsdl.php';
 		} else {
 			$data['content'] = 'key';
 		}
 
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -119,7 +127,21 @@ class Ptsdl extends CI_Controller
 		$get_aum = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_aum[0]['id'], 'kelas' => $id));
 		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
-		$data['content'] = 'aum_ptsdl_detail.php';
+
+		$get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
+		$day_remaining = 0;
+
+		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+			$data['content'] = 'aum_ptsdl_detail.php';
+		} else {
+			$data['content'] = 'key';
+		}
+
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -136,6 +158,10 @@ class Ptsdl extends CI_Controller
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
+
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
 
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
@@ -155,6 +181,8 @@ class Ptsdl extends CI_Controller
 			$jawaban[] = unserialize($value['jawaban']);
 			$jawaban_berat = unserialize($value['jawaban_berat']);
 		}
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
 
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
@@ -213,7 +241,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -785,6 +813,10 @@ class Ptsdl extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
+
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
 			if (!$get_data_logo) {
@@ -798,6 +830,8 @@ class Ptsdl extends CI_Controller
 			$jawaban[] = unserialize($value['jawaban']);
 			$jawaban_berat = unserialize($value['jawaban_berat']);
 		}
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
 
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
@@ -856,7 +890,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1421,6 +1455,10 @@ class Ptsdl extends CI_Controller
 		$jawaban = unserialize($get_profil[0]['jawaban']);
 		$jawaban_mentah = unserialize($get_profil[0]['jawaban']);
 
+		if (!$get_profil) {
+			show_error('Error When Fetch data', 500);
+		}
+
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
 			if (!$get_data_logo) {
@@ -1429,6 +1467,8 @@ class Ptsdl extends CI_Controller
 		} else {
 			$get_data_logo = '';
 		}
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
 
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
@@ -1541,7 +1581,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);

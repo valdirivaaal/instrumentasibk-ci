@@ -8,6 +8,7 @@ class Auap extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
@@ -37,7 +38,7 @@ class Auap extends CI_Controller
 	{
 		// $this->load->library('encrypt');
 		$this->load->library('encryption');
-		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')));
+		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')), 'id', 'DESC', 1);
 		$data['get_profil'] = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 
 		$data['get_kelompok'] = $this->Main_model->get_where('kelompok', array('user_id' => $this->session->userdata('id')));
@@ -54,14 +55,24 @@ class Auap extends CI_Controller
 
 		$data['jenjang'] =  $jenjang;
 
+
+		$day_remaining = 0;
+
 		if ($get_ticket) {
 			if ($jenjang) {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id'), 'jenjang' => $jenjang), 'kelas', 'asc');
 			} else {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id')), 'kelas', 'asc');
 			}
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 			$data['content'] = 'auap.php';
 		} else {
+			$data['content'] = 'key';
+		}
+
+
+		if ($day_remaining <= 0) {
+
 			$data['content'] = 'key';
 		}
 
@@ -85,7 +96,21 @@ class Auap extends CI_Controller
 		$get_auap = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_auap[0]['id'], 'kelas' => $id));
 		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
-		$data['content'] = 'auap_detail.php';
+
+		$get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
+		$day_remaining = 0;
+
+		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+			$data['content'] = 'auap_detail.php';
+		} else {
+			$data['content'] = 'key';
+		}
+
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -102,6 +127,12 @@ class Auap extends CI_Controller
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
 
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
@@ -238,7 +269,7 @@ class Auap extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -471,6 +502,12 @@ class Auap extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
+
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
 			if (!$get_data_logo) {
@@ -602,7 +639,7 @@ class Auap extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -835,6 +872,12 @@ class Auap extends CI_Controller
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 		$jawaban = unserialize($get_profil[0]['jawaban']);
 
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
+		if (!$get_profil) {
+			show_error('Error When Fetch data', 500);
+		}
+
 		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
 			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
 			if (!$get_data_logo) {
@@ -898,7 +941,7 @@ class Auap extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, getField('user_info', 'instansi', array('id' => $this->session->userdata('id'))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
