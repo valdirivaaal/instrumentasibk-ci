@@ -90,7 +90,7 @@ class Aum extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUM Umum', 'jenjang' => $data['get_profil'][0]['jenjang']));
 
 		$get_aum = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
-
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_aum[0]['id'], 'kelas' => $id));
 		$data['content'] = 'aum_detail.php';
 
@@ -453,7 +453,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetWidths(array(40, 18, 18, 18, 18, 18, 18, 18));
 		$pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $key => $value) {
 			$pdf->Cell(12, 7, '', 0, 0, 'L');
@@ -559,7 +559,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 		arsort($sumArrayBerat);
@@ -592,7 +592,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->Cell(8, 7, '', 0, 0, 'L');
 		$pdf->SetAligns(array('C', 'C', 'C', 'C'));
@@ -926,7 +926,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetWidths(array(40, 18, 18, 18, 18, 18, 18, 18));
 		$pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 
 		foreach ($get_aspek as $key => $value) {
@@ -1032,7 +1032,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 		arsort($sumArrayBerat);
@@ -1064,7 +1064,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->Cell(8, 7, '', 0, 0, 'L');
 		$pdf->SetAligns(array('C', 'C', 'C', 'C'));
@@ -1213,7 +1213,7 @@ class Aum extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 
 		foreach ($get_aspek as $value_aspek) {
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = array();
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
 			foreach ($get_butir as $key => $value) {
 				if (@$jawaban[$value['id']]) {
@@ -1358,7 +1358,7 @@ class Aum extends CI_Controller
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = array();
 			$array_masalah_berat = array();
 			foreach ($get_butir as $key => $value) {
 				if (@$jawaban[$value['id']]) {

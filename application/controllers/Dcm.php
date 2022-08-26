@@ -131,6 +131,7 @@ class Dcm extends CI_Controller
 		$get_dcm = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_dcm[0]['id'], 'kelas' => $id));
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
 		$data['content'] = 'dcm_detail.php';
 
 		$this->load->view('main.php', $data, FALSE);
@@ -774,7 +775,7 @@ class Dcm extends CI_Controller
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(10, 90, 50, 20));
 
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 		$pdf->Cell(8, 7, '', 0, 0, 'L');

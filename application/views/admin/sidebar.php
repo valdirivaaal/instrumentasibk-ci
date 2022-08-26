@@ -53,7 +53,7 @@
   				</a>
   			</li>
   			<li>
-  				<a class="<?= (uri_string() == 'admin/tahun_ajaran') ? 'active' : '' ?>" href="<?= base_url('') ?>admin/pengumuman">
+  				<a class="<?= (uri_string() == 'admin/tahun_ajaran') ? 'active' : '' ?>" href="<?= base_url('') ?>admin/tahun_ajaran">
   					<i class="fa fa-calendar"></i>
   					<span>Ubah Tahun Ajaran</span>
   				</a>

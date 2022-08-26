@@ -118,6 +118,7 @@ class Ptsdl extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUM PTSDL', 'jenjang' => $data['get_profil'][0]['jenjang']));
 		$get_aum = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_aum[0]['id'], 'kelas' => $id));
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
 		$data['content'] = 'aum_ptsdl_detail.php';
 
 		$this->load->view('main.php', $data, FALSE);
@@ -389,7 +390,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(25, 20, 20, 71, 18, 18));
 		$pdf->SetAligns(array('C', 'C', 'C', 'L', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
@@ -431,7 +432,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(185, 6, 'Tabel 3. Skor Item PTSDL Tertinggi Dalam Kelompok', 0, 0, 'C');
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 
@@ -464,7 +465,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(185, 6, 'Tabel 4. Item Masalah PTSDL Tertinggi Dalam Kelompok', 0, 0, 'C');
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArrayMasalah);
 
@@ -496,7 +497,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -564,7 +565,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -676,7 +677,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetWidths(array(25, 10, 10, 10, 6, 6, 6, 6, 6, 12, 12, 12, 13, 13, 25));
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($array_jawaban as $value) {
 			foreach ($value as $key2 => $value2) {
@@ -1019,7 +1020,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(25, 20, 20, 71, 18, 18));
 		$pdf->SetAligns(array('C', 'C', 'C', 'L', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
@@ -1060,7 +1061,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(185, 6, 'Tabel 3. Skor Item Komponen PTSDL Tertinggi Dalam Kelompok', 0, 0, 'C');
 		$pdf->Ln();
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 
@@ -1093,7 +1094,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -1156,7 +1157,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(50, 6, '1. Item Masalah Komponen PTSDL Paling Dominan Dalam Kelompok', 0, 1, 'L');
 		$pdf->Cell(185, 6, 'Tabel 5. Item Masalah Komponen PTSDL Paling Dominan Dalam Kelompok', 0, 1, 'C');
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArrayMasalah);
 
@@ -1188,7 +1189,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -1300,7 +1301,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetWidths(array(25, 10, 10, 10, 6, 6, 6, 6, 6, 12, 12, 12, 13, 13, 25));
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($array_jawaban as $value) {
 			foreach ($value as $key2 => $value2) {
@@ -1629,11 +1630,11 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(25, 20, 20, 71, 18, 18));
 		$pdf->SetAligns(array('C', 'C', 'C', 'L', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = array();
 
 			foreach ($get_butir as $key => $value) {
 				if ($jawaban[$value['id']] == 'Masalah') {
@@ -1761,7 +1762,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetWidths(array(25, 10, 10, 10, 30, 12, 12, 12, 13, 13, 25));
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->SetLeftMargin(16);
 		foreach ($get_aspek as $value_aspek) {

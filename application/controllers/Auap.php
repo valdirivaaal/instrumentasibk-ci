@@ -84,6 +84,7 @@ class Auap extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUAP', 'jenjang' => $data['get_profil'][0]['jenjang']));
 		$get_auap = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_auap[0]['id'], 'kelas' => $id));
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
 		$data['content'] = 'auap_detail.php';
 
 		$this->load->view('main.php', $data, FALSE);
@@ -399,7 +400,7 @@ class Auap extends CI_Controller
 		$pdf->Cell(36, 7, 'Skor Rata-Rata', 'R,B,T', 1, 'C');
 
 		$pdf->SetWidths(array(90, 40, 36));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'C', 'C'));
 
 		$pdf->SetLeftMargin(22);
@@ -751,7 +752,7 @@ class Auap extends CI_Controller
 		$pdf->Cell(36, 7, 'Skor Rata-Rata', 'R,B,T', 1, 'C');
 
 		$pdf->SetWidths(array(90, 40, 36));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'C', 'C'));
 
 		$pdf->SetLeftMargin(22);
@@ -1204,7 +1205,7 @@ class Auap extends CI_Controller
 		$pdf->Cell(57.5, 6, 'Pilihan 3', 1, 1, 'C');
 
 		$pdf->SetWidths(array(57.5, 57.5, 57.5));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->Cell(6, 4, '', 0, 0, 'L');
 		$pdf->SetAligns(array('C', 'C', 'C'));
@@ -1216,7 +1217,7 @@ class Auap extends CI_Controller
 
 		$pdf->SetFont('Arial', '', 10);
 		$pdf->SetWidths(array(10, 23.75, 23.75, 10, 23.75, 23.75, 10, 23.75, 23.75));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
