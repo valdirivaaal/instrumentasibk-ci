@@ -405,6 +405,26 @@ class Admin extends CI_Controller
 		$this->session->set_flashdata('success', ' Pengumuman');
 		redirect(base_url('admin/pengumuman'));
 	}
+
+	public function tahun_ajaran()
+	{
+		$data['content'] = 'admin/tahun_ajaran';
+		$data['get_data'] = $this->Main_model->get_where('tahun_ajaran', ['id' => 1]);
+
+		$this->load->view('admin/main', $data, False);
+	}
+
+	public function tahun_ajaran_action()
+	{
+		$post = $this->input->post();
+		$this->Main_model->update_data('tahun_ajaran', $post, ['id' => 1]); //setting status
+		if ($post['status'] == 'Tidak Aktif') {
+			$post['tahun_ajaran'] = $this->Main_model->getTahunAjaran();
+		}
+		$this->Main_model->update_data('tahun_ajaran', $post, ['id' => 1]); //setting tanggal
+		$this->session->set_flashdata('success', ' Tahun Ajaran');
+		redirect(base_url('admin/tahun_ajaran'));
+	}
 }
 
 /* End of file Admin.php */

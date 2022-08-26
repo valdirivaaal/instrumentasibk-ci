@@ -53,6 +53,12 @@
   				</a>
   			</li>
   			<li>
+  				<a class="<?= (uri_string() == 'admin/tahun_ajaran') ? 'active' : '' ?>" href="<?= base_url('') ?>admin/pengumuman">
+  					<i class="fa fa-calendar"></i>
+  					<span>Ubah Tahun Ajaran</span>
+  				</a>
+  			</li>
+  			<li>
   				<a class="<?= (uri_string() == 'dashboard') ? 'active' : '' ?>" href="<?= base_url('') ?>">
   					<i class="fa fa-arrow-left"></i>
   					<span>Back to Instrumentasi BK</span>

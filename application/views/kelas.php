@@ -31,8 +31,9 @@
 								<th>Jumlah Siswa</th>
 								<th><?= ($get_profil[0]['status'] == 'Guru BK') ? 'Guru BK' : 'Konselor' ?></th>
 								<?php if ($get_profil[0]['status'] == 'Konselor') { ?>
-									<th>Jenjangr</th>
+									<th>Jenjang</th>
 								<?php } ?>
+								<th>Tahun Ajaran</th>
 								<th>Action</th>
 							</tr>
 						</thead>
@@ -47,13 +48,14 @@
 									<td><?= $value['jumlah_siswa'] ?></td>
 									<td><?= $value['nama_lengkap'] ?></td>
 									<?php if ($get_profil[0]['status'] == 'Konselor') { ?>
-										<td><?= $value['jenjang'] ?></th>
-										<?php } ?>
-										<td>
-											<a href="<?= base_url('kelas/sunting/' . $value['id']) ?>" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i> Ubah</a>
-											<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $value['id'] ?>" data-id="<?= $value['id'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus</button>
-											<a href="<?php echo base_url('kelas/detail/' . $value['id']); ?>" class="btn btn-sm btn-info"><i class="fa fa-file"></i> Daftar Siswa</a>
-										</td>
+										<td><?= $value['jenjang'] ?></td>
+									<?php } ?>
+									<td><?= $value['tahun_ajaran'] ?></td>
+									<td>
+										<a href="<?= base_url('kelas/sunting/' . $value['id']) ?>" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i> Ubah</a>
+										<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $value['id'] ?>" data-id="<?= $value['id'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus</button>
+										<a href="<?php echo base_url('kelas/detail/' . $value['id']); ?>" class="btn btn-sm btn-info"><i class="fa fa-file"></i> Daftar Siswa</a>
+									</td>
 								</tr>
 							<?php
 							}
@@ -64,7 +66,11 @@
 								<th>No</th>
 								<th><?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></th>
 								<th>Jumlah Siswa</th>
-								<th><?= ($get_profil[0]['status'] == 'Guru BK') ? 'Guru BK' : 'Jenjang' ?></th>
+								<th><?= ($get_profil[0]['status'] == 'Guru BK') ? 'Guru BK' : 'Konselor' ?></th>
+								<?php if ($get_profil[0]['status'] == 'Konselor') { ?>
+									<th>Jenjang</th>
+								<?php } ?>
+								<th>Tahun Ajaran</th>
 								<th>Action</th>
 							</tr>
 						</tfoot>

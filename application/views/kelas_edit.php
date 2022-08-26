@@ -65,6 +65,14 @@
  					<?php
 						}
 						?>
+ 					<div class="form-group">
+ 						<label class="col-lg-12 control-label">Tahun Ajaran</label>
+ 						<div class="col-lg-12">
+ 							<input type="text" placeholder="yyyy/yyyy" data-mask="9999/9999" class="form-control" name="tahun_ajaran" value="<?= !isset($get_kelas[0]['tahun_ajaran']) ? '' : $get_kelas[0]['tahun_ajaran']  ?>">
+ 							<span class="help-inline">Format : yyyy/yyyy</span><br>
+ 							<span class="help-inline">Contoh : <?= $this->Main_model->getTahunAjaran() ?></span>
+ 						</div>
+ 					</div>
  					<div class="form-group-append">
  					</div>
  					<div class="form-group">

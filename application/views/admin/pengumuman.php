@@ -35,7 +35,7 @@
 							<option value="hide" <?= $get_data[0]['status'] == 'hide' ? 'selected' : '' ?>>Hide</option>
 						</select>
 					</div>
-					<button type="submit" class="btn btn-primary container-fluid">Edit User</button>
+					<button type="submit" class="btn btn-primary container-fluid">Edit Pengumuman</button>
 				</form>
 			</div>
 

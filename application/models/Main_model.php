@@ -197,6 +197,26 @@ class Main_model extends CI_Model
 		}
 		return $kd;
 	}
+
+	public function getTahunAjaran()
+	{
+		$yearNow = date('Y');
+		$yearBefore = $yearNow - 1;
+		$yearAfter = $yearNow + 1;
+		$data = $this->get_where('tahun_ajaran', ['id' => 1]);
+
+		if (date('m') >= 7) {
+			$tahun_ajaran = $yearNow . '/' . $yearAfter;
+		} else {
+			$tahun_ajaran = $yearBefore . '/' . $yearNow;
+		}
+
+		if ($data[0]['status'] == 'Aktif') {
+			return $data[0]['tahun_ajaran'];
+		} else {
+			return $tahun_ajaran;
+		}
+	}
 }
 
 /* End of file Pasien.php */
