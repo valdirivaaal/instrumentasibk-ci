@@ -46,6 +46,8 @@
 								<th>Masa Berlaku Hingga</th>
 								<?php if ($state == 'available') { ?>
 									<th>Action</th>
+								<?php } else { ?>
+									<th>Status</th>
 								<?php } ?>
 							</tr>
 						</thead>
@@ -74,6 +76,8 @@
 											<a href="<?= base_url('admin/key/' . $value['event_key']) ?>" class="btn btn-info">Edit</a>
 											<button onclick="deletealert(this)" data-id="<?= $value['id'] ?>" class="btn btn-danger delete-alert<?= $value['id'] ?>">Hapus</button>
 										</td>
+									<?php } else { ?>
+										<td><?= $get_ticket[0]['tgl_kadaluarsa'] <= date('Y-m-d') ? 'Expired' : 'Active' ?></td>
 									<?php } ?>
 								</tr>
 							<?php
@@ -109,6 +113,8 @@
 								<th>Masa Berlaku Hingga</th>
 								<?php if ($state == 'available') { ?>
 									<th>Action</th>
+								<?php } else { ?>
+									<th>Status</th>
 								<?php } ?>
 							</tr>
 						</thead>
@@ -138,6 +144,8 @@
 											<a href="<?= base_url('admin/key/' . $value['event_key']) ?>" class="btn btn-info">Edit</a>
 											<button onclick="deletealert(this)" data-id="<?= $value['id'] ?>" class="btn btn-danger delete-alert<?= $value['id'] ?>">Hapus</button>
 										</td>
+									<?php } else { ?>
+										<td><?= $get_ticket[0]['tgl_kadaluarsa'] <= date('Y-m-d') ? 'Expired' : 'Active' ?></td>
 									<?php } ?>
 								</tr>
 							<?php
@@ -173,6 +181,8 @@
 								<th>Masa Berlaku Hingga</th>
 								<?php if ($state == 'available') { ?>
 									<th>Action</th>
+								<?php } else { ?>
+									<th>Status</th>
 								<?php } ?>
 							</tr>
 						</thead>
@@ -202,6 +212,8 @@
 											<a href="<?= base_url('admin/key/' . $value['event_key']) ?>" class="btn btn-info">Edit</a>
 											<button onclick="deletealert(this)" data-id="<?= $value['id'] ?>" class="btn btn-danger delete-alert<?= $value['id'] ?>">Hapus</button>
 										</td>
+									<?php } else { ?>
+										<td><?= $get_ticket[0]['tgl_kadaluarsa'] <= date('Y-m-d') ? 'Expired' : 'Active' ?></td>
 									<?php } ?>
 								</tr>
 							<?php

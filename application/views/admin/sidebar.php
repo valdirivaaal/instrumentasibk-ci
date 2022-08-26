@@ -47,6 +47,12 @@
   				</a>
   			</li>
   			<li>
+  				<a class="<?= (uri_string() == 'admin/pengumuman') ? 'active' : '' ?>" href="<?= base_url('') ?>admin/pengumuman">
+  					<i class="fa fa-bullhorn"></i>
+  					<span>Ubah Pengumuman</span>
+  				</a>
+  			</li>
+  			<li>
   				<a class="<?= (uri_string() == 'dashboard') ? 'active' : '' ?>" href="<?= base_url('') ?>">
   					<i class="fa fa-arrow-left"></i>
   					<span>Back to Instrumentasi BK</span>

@@ -389,6 +389,22 @@ class Admin extends CI_Controller
 		]);
 		redirect(base_url() . 'admin/key_available');
 	}
+
+	public function pengumuman()
+	{
+		$data['content'] = 'admin/pengumuman';
+		$data['get_data'] = $this->Main_model->get_where('pengumuman', ['id' => 1]);
+
+		$this->load->view('admin/main', $data, False);
+	}
+
+	public function pengumuman_action()
+	{
+		$post = $this->input->post();
+		$this->Main_model->update_data('pengumuman', $post, ['id' => 1]);
+		$this->session->set_flashdata('success', ' Pengumuman');
+		redirect(base_url('admin/pengumuman'));
+	}
 }
 
 /* End of file Admin.php */

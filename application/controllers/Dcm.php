@@ -106,10 +106,10 @@ class Dcm extends CI_Controller
 			$data['content'] = 'key_dcm';
 		}
 
-		if ($day_remaining <= 0) {
+		// if ($day_remaining <= 0) {
 
-			$data['content'] = 'key_dcm';
-		}
+		// 	$data['content'] = 'key_dcm';
+		// }
 
 		$this->load->view('main.php', $data, FALSE);
 	}
