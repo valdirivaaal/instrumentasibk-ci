@@ -32,7 +32,7 @@
  						<div class="col-md-12">
  							<div class="form-group">
  								<select class="form-control" name="konselor_id" required>
- 									<option value="">Pilih <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Guru BK' : 'Kpnselor' ?></option>
+ 									<option value="">Pilih <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Guru BK' : 'Konselor' ?></option>
  									<?php
 										foreach ($get_konselor as $key => $value) {
 										?>
@@ -53,11 +53,11 @@
  								<div class="form-group">
  									<select class="form-control" name="jenjang" required>
  										<option value="" selected>Pilih jenjang kelas</option>
- 										<option value="SD">SD</option>
- 										<option value="SMP">SMP</option>
- 										<option value="SMA">SMA</option>
- 										<option value="PT">Perguruan Tinggi</option>
- 										<option value="Umum">UMUM</option>
+ 										<option value="SD" <?= $get_kelas[0]['jenjang'] == 'SD' ? 'selected' : '' ?>>SD</option>
+ 										<option value="SMP" <?= $get_kelas[0]['jenjang'] == 'SMP' ? 'selected' : '' ?>>SMP</option>
+ 										<option value="SMA" <?= $get_kelas[0]['jenjang'] == 'SMA' ? 'selected' : '' ?>>SMA</option>
+ 										<option value="PT" <?= $get_kelas[0]['jenjang'] == 'PT' ? 'selected' : '' ?>>Perguruan Tinggi</option>
+ 										<option value="Umum" <?= $get_kelas[0]['jenjang'] == 'Umum' ? 'selected' : '' ?>>UMUM</option>
  									</select>
  								</div>
  							</div>

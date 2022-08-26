@@ -18,7 +18,7 @@
 				<?php
 				}
 				?>
-				<a class="btn btn-primary btn-sm float-right ml-2" href="<?= base_url('dcm/laporan_kelas/' . $id) ?>"><i class="fa fa-book"></i> Cetak Laporan Kelas</a>
+				<a class="btn btn-primary btn-sm float-right ml-2" target="_blank" href="<?= base_url('dcm/laporan_kelas/' . $id) ?>"><i class="fa fa-book"></i> Cetak Laporan Kelas</a>
 				<a onclick='downloadAll()' id="download_all" href="#" class="btn btn-sm float-right ml-2 btn-primary"><i class="fa fa-download"></i> Unduh Semua Laporan Individu</a>
 				<div class="adv-table">
 					<table class="display table table-bordered table-striped" id="dynamic-table">

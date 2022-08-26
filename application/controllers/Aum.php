@@ -165,6 +165,15 @@ class Aum extends CI_Controller
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
+			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
+			if (!$get_data_logo) {
+				$get_data_logo = '';
+			}
+		} else {
+			$get_data_logo = '';
+		}
+
 		$total_peserta = 0;
 		foreach ($get_kelas as $key => $value) {
 			$total_peserta += $value['jumlah_siswa'];
@@ -217,10 +226,12 @@ class Aum extends CI_Controller
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
-		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+		if (!empty($get_data_logo)) {
+			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
+		} else if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -641,6 +652,16 @@ class Aum extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
+			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
+			if (!$get_data_logo) {
+				$get_data_logo = '';
+			}
+		} else {
+			$get_data_logo = '';
+		}
+
+
 		foreach ($get_data as $key => $value) {
 			$jawaban = unserialize($value['jawaban']);
 			$jawaban_berat = unserialize($value['jawaban_berat']);
@@ -690,10 +711,12 @@ class Aum extends CI_Controller
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
-		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+		if (!empty($get_data_logo)) {
+			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
+		} else if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -1109,6 +1132,16 @@ class Aum extends CI_Controller
 			$get_kelas = $this->Main_model->get_where('kelas', array('id' => $get_profil[0]['kelas']));
 			$get_user[0]['jenjang'] = $get_kelas[0]['jenjang'];
 		}
+
+		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
+			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
+			if (!$get_data_logo) {
+				$get_data_logo = '';
+			}
+		} else {
+			$get_data_logo = '';
+		}
+
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUM Umum', 'jenjang' => $get_user[0]['jenjang']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 		$jawaban = unserialize($get_profil[0]['jawaban']);
@@ -1119,10 +1152,13 @@ class Aum extends CI_Controller
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
-		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+
+		if (!empty($get_data_logo)) {
+			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
+		} else if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
