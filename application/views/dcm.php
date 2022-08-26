@@ -79,7 +79,10 @@
 									<td><?= $value_kelas['jumlah_siswa'] ?> Siswa (<?= count($total_dcm) . " Siswa" ?>)</td>
 									<td><?= $value_kelas['kelas'] ?></td>
 									<td><?= $value_kelas['tahun_ajaran'] ?></td>
-									<td><a class="btn btn-sm btn-primary ml-2" href="<?= base_url('dcm/view/' . $value_kelas['id']) ?>"><i class="fa fa-eye"></i> Buka</a><button type="button" class="btn btn-sm btn-danger ml-2"><i class="fa fa-trash-o"></i> Hapus</button></td>
+									<td>
+										<a class="btn btn-sm btn-primary ml-2" href="<?= base_url('dcm/view/' . $value_kelas['id']) ?>"><i class="fa fa-eye"></i> Buka</a>
+										<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $value_kelas['id'] ?>" data-id="<?= $value_kelas['id'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus Semua Laporan</button>
+									</td>
 								</tr>
 							<?php
 							}
@@ -101,3 +104,51 @@
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+	function deletealert(data) {
+		var id = data.getAttribute("data-id");
+		swal.fire({
+			title: 'Apakah kamu yakin?',
+			text: "Dengan mengklik Yes Anda akan menghapus semua Jawaban / Laporan yang ada pada kelas tersebut.",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.value) {
+				$.ajax({
+					type: "POST",
+					url: "<?= base_url() ?>hapus/dcm/" + id,
+					cache: false,
+					success: function(response) {
+						swal.fire({
+							title: 'Terhapus!',
+							text: 'Tunggu beberapa detik atau klik ok.',
+							type: 'success',
+							timer: 3000
+						}, function() {
+							window.location.reload();
+						});
+						setTimeout(function() {
+							window.location.reload();
+						}, 3000);
+					},
+					error: function(response) {
+						swal.fire({
+							title: 'Gagal',
+							text: 'Tunggu beberapa detik atau klik ok.',
+							type: 'error',
+							timer: 3000
+						}, function() {
+							window.location.reload();
+						});
+						setTimeout(function() {
+							window.location.reload();
+						}, 3000);
+					}
+				})
+			}
+		})
+	}
+</script>
