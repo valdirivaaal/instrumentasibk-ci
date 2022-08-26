@@ -124,6 +124,7 @@ class Profil extends CI_Controller
 	{
 		$data['content'] = 'kop_surat.php';
 		$data['get_kopsurat'] = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
+		$data['get_logo'] = $this->Main_model->get('logo_daerah');
 
 		$this->load->view('main.php', $data, FALSE);
 	}
