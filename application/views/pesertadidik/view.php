@@ -53,7 +53,7 @@
 					</div>
 				</form>
 				<a onclick='downloadAll()' id="download_all" href="#" class="btn btn-sm float-right ml-2 btn-primary"><i class="fa fa-download"></i> Unduh Semua Laporan Individu</a>
-				<a onclick='downloadKelas()' id="download_all" href="#" class="btn btn-sm float-right ml-2 btn-warning"><i class="fa fa-download"></i> Unduh Laporan Kelas</a>
+				<a onclick='downloadKelas()' id="download_kelas" href="#" class="btn btn-sm float-right ml-2 btn-warning"><i class="fa fa-download"></i> Unduh Laporan Kelas</a>
 				<div class="adv-table table-responsive">
 					<table id="mytable" class="display table table-bordered table-striped dynamic-table">
 						<thead style="vertical-align : middle;text-align:center;">
@@ -265,12 +265,12 @@
 	function downloadKelas() {
 		var myTable = $("#mytable").DataTable();
 		var zip = new JSZip();
-		var a = document.querySelector("#download_all");
-		$("#download_all").text("Sedang mendownload file");
-		$("#download_all").removeClass("btn-success");
-		$("#download_all").addClass("btn-danger");
-		$("#download_all").attr("disabled", "disabled");
-		// $("#download_all").hide();
+		var a = document.querySelector("#download_kelas");
+		$("#download_kelas").text("Sedang mendownload file");
+		$("#download_kelas").removeClass("btn-success");
+		$("#download_kelas").addClass("btn-danger");
+		$("#download_kelas").attr("disabled", "disabled");
+		// $("#download_kelas").hide();
 		var kelas = "<?= $get_kelas[0]['kelas'] ?>";
 		var tahun_ajaran = "<?= $get_kelas[0]['tahun_ajaran'] ?>";
 		var sekolah = "<?= $get_profil[0]['instansi'] ?>";
@@ -324,13 +324,13 @@
 						type: "blob"
 					})
 					.then(function(content) {
-						$("#download_all").attr("href", URL.createObjectURL(content));
-						$("#download_all").attr("download", "Laporan Kelas " + kelas + "- Tahun Ajaran " + tahun_ajaran + " - " + sekolah);
-						$("#download_all").removeAttr("onclick");
-						$("#download_all").removeAttr("disabled");
-						$("#download_all").removeClass("btn-danger");
-						$("#download_all").addClass("btn-primary");
-						$("#download_all").html("<i class='fa fa-download'></i> Unduh Laporan Kelas");
+						$("#download_kelas").attr("href", URL.createObjectURL(content));
+						$("#download_kelas").attr("download", "Laporan Kelas " + kelas + "- Tahun Ajaran " + tahun_ajaran + " - " + sekolah);
+						$("#download_kelas").removeAttr("onclick");
+						$("#download_kelas").removeAttr("disabled");
+						$("#download_kelas").removeClass("btn-danger");
+						$("#download_kelas").addClass("btn-primary");
+						$("#download_kelas").html("<i class='fa fa-download'></i> Unduh Laporan Kelas");
 						saveAs(content, "Laporan Kelas " + kelas + "- Tahun Ajaran " + tahun_ajaran + " - " + sekolah);
 					});
 			})
