@@ -39,6 +39,13 @@
 							<option value="3">DCM</option>
 						</select>
 					</div>
+					<div class="mb-3">
+						<label for="" class="form-label">Key Type</label>
+						<select class="form-control" name="key_type">
+							<option value="single">Single Key</option>
+							<option value="multi">Multi Key</option>
+						</select>
+					</div>
 					<button type="submit" class="btn btn-primary container-fluid">Generate Key</button>
 				</form>
 			</div>

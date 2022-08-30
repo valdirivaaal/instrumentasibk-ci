@@ -23,6 +23,13 @@
   				</a>
   			</li>
 
+  			<li>
+  				<a class="<?= (uri_string() == 'admin/pesertadidik') ? 'active' : '' ?>" href="<?= base_url('admin/pesertadidik') ?>">
+  					<i class="fa fa-users"></i>
+  					<span>Daftar Narasumber</span>
+  				</a>
+  			</li>
+
   			<li class="sub-menu">
   				<a href="javascript:;" class="<?= (uri_string() == '' || uri_string() == 'admin/key_available' || uri_string() == 'admin/key_used') ? 'active' : '' ?>">
   					<i class="fa fa-key"></i>

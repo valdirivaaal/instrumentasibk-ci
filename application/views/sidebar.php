@@ -50,6 +50,12 @@ if (!empty($get_user)) {
 					<span>Daftar <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></span>
 				</a>
 			</li>
+			<li>
+				<a class="<?= (getController() == 'pesertadidik') ? 'active' : '' ?>" href="<?= base_url('pesertadidik') ?>">
+					<i class="fa fa-graduation-cap"></i>
+					<span>Daftar Peserta Didik</span>
+				</a>
+			</li>
 
 			<?php
 			if (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') {

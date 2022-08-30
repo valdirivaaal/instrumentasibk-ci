@@ -238,7 +238,8 @@ class Admin extends CI_Controller
 		$data = [
 			'masa_berlaku' => $masa_berlaku,
 			'status' => 'Inactive',
-			'tipe' => $post['tipe']
+			'tipe' => $post['tipe'],
+			'key_type' => $post['key_type']
 		];
 
 		if (!$length) {
@@ -425,7 +426,462 @@ class Admin extends CI_Controller
 		$this->session->set_flashdata('success', ' Tahun Ajaran');
 		redirect(base_url('admin/tahun_ajaran'));
 	}
-}
 
+	public function pesertadidik()
+	{
+		$post = $this->input->get();
+		// if (empty($post['tahun_ajaran'])) {
+		// 	return redirect('admin/pesertadidik?tahun_ajaran=' . $this->Main_model->getTahunAjaran());
+		// }
+
+		$sekolah = isset($post['sekolah']) ? $post['sekolah'] : '';
+		$tahun_ajaran = isset($post['tahun_ajaran']) ? $post['tahun_ajaran'] : '';
+		$data_temp = []; // Empty Array 
+
+		if (empty($sekolah) && empty($tahun_ajaran)) { //Sekolah dan tahun ajaran kosong (Tmapilkan semua data)
+			$temp_siswa = $this->db->query("SELECT instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas FROM `instrumen_jawaban` GROUP BY instrumen_jawaban.nama_lengkap")->result_array();
+
+			$get_siswa = $this->Main_model->get('kelas_siswa');
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// Compare and unite Data from Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		} else if (empty($sekolah) && !empty($tahun_ajaran)) { //Sekolah kosong tahun ajaran ada , tampilkan semua data pada tahun ajaran tersebut
+
+			$temp_siswa = $this->Main_model->innerJoin('instrumen_jawaban', 'instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas', [[
+				'table' => 'kelas',
+				'parameter' => 'kelas.id = instrumen_jawaban.kelas',
+			]], ['kelas.tahun_ajaran' => $tahun_ajaran], '', '', '', 'instrumen_jawaban.nama_lengkap');
+
+			$get_siswa = $this->Main_model->innerJoin(
+				'kelas_siswa',
+				'kelas_siswa.*',
+				[[
+					'table' => 'kelas',
+					'parameter' => 'kelas.id = kelas_siswa.id_kelas',
+				]],
+				['kelas.tahun_ajaran' => $tahun_ajaran]
+			);
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// Compare and unite Data from Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		} else if (!empty($sekolah) && !empty($tahun_ajaran)) { //Semua terisi
+
+			$temp_siswa = $this->Main_model->innerJoin(
+				'instrumen_jawaban',
+				'instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas',
+				[[
+					'table' => 'kelas',
+					'parameter' => 'kelas.id = instrumen_jawaban.kelas',
+				], [
+					'table' => 'user_info',
+					'parameter' => 'kelas.user_id = user_info.id'
+				]],
+				[
+					'kelas.tahun_ajaran' => $tahun_ajaran,
+					'user_info.instansi' => $sekolah
+				],
+				'',
+				'',
+				'',
+				'instrumen_jawaban.nama_lengkap'
+			);
+
+			$get_siswa = $this->Main_model->innerJoin(
+				'kelas_siswa',
+				'kelas_siswa.*',
+				[[
+					'table' => 'kelas',
+					'parameter' => 'kelas.id = kelas_siswa.id_kelas',
+				], [
+					'table' => 'user_info',
+					'parameter' => 'kelas.user_id = user_info.id'
+				]],
+				['kelas.tahun_ajaran' => $tahun_ajaran, 'user_info.instansi' => $sekolah]
+			);
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// Compare and unite Data from Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		} else { //Kondisi lainnya
+			$temp_siswa = $this->Main_model->innerJoin('instrumen_jawaban', 'instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas', [[
+				'table' => 'kelas',
+				'parameter' => 'kelas.id = instrumen_jawaban.kelas',
+			], [
+				'table' => 'user_info',
+				'parameter' => 'kelas.user_id = user_info.user_id'
+			]], ['user_info.instansi' => $sekolah], '', '', '', 'instrumen_jawaban.nama_lengkap');
+
+			$get_siswa = $this->Main_model->innerJoin('kelas_siswa', 'kelas_siswa.*', [[
+				'table' => 'kelas',
+				'parameter' => 'kelas.id = kelas_siswa.id_kelas',
+			], [
+				'table' => 'user_info',
+				'parameter' => 'kelas.user_id = user_info.user_id'
+			]], ['user_info.instansi' => $sekolah]);
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		}
+
+		$get_tahun_ajaran = $this->db->query("SELECT DISTINCT tahun_ajaran FROM kelas")->result_array();
+
+		// $getSekolah = $this->Main_model->get_where('user_info',);
+
+		$listData = $data_temp;
+
+		$data = [
+			'content' => 'admin/pesertadidik',
+			'siswa' => $listData,
+			'tahun_ajaran' => $get_tahun_ajaran
+		];
+
+		$this->load->view('admin/main', $data, FALSE);
+	}
+
+	public function getsekolah()
+	{
+		$post = $this->input->post();
+
+		if (empty($post['tahunajaran'])) {
+			$get_kelas = $this->Main_model->innerJoin('kelas', 'user_info.instansi as instansi', [[
+				'table' => 'user_info',
+				'parameter' => 'user_info.id = kelas.user_id'
+			]]);
+
+			echo "<option value=''>Lihat Seluruh Sekolah</option>";
+			foreach ($get_kelas as $val) {
+				if (!empty($post['sekolah']) && $post['sekolah'] == $val['instansi']) {
+					$selected = 'selected';
+				} else {
+					$selected = '';
+				}
+				echo "<option value='" . $val['instansi'] . "' " . $selected . ">" . $val['instansi'] . "</option>";
+			}
+		} else {
+			$get_kelas = $this->Main_model->innerJoin('kelas', 'user_info.instansi as instansi', [[
+				'table' => 'user_info',
+				'parameter' => 'user_info.id = kelas.user_id'
+			]], ['kelas.tahun_ajaran' => $post['tahunajaran']]);
+
+			echo "<option value=''>Lihat Seluruh Sekolah</option>";
+			foreach ($get_kelas as $val) {
+				if (isset($post['sekolah']) && $post['sekolah'] == $val['instansi']) {
+					$selected = 'selected';
+				} else {
+					$selected = '';
+				}
+				echo "<option value='" . $val['instansi'] . "' " . $selected . ">" . $val['instansi'] . "</option>";
+			}
+		}
+	}
+
+	public function download_narasumber()
+	{
+		$post = $this->input->get();
+		// if (empty($post['tahun_ajaran'])) {
+		// 	return redirect('admin/pesertadidik?tahun_ajaran=' . $this->Main_model->getTahunAjaran());
+		// }
+
+		$sekolah = isset($post['sekolah']) ? $post['sekolah'] : '';
+		$tahun_ajaran = isset($post['tahun_ajaran']) ? $post['tahun_ajaran'] : '';
+		$data_temp = []; // Empty Array 
+
+		if (empty($sekolah) && empty($tahun_ajaran)) { //Sekolah dan tahun ajaran kosong (Tmapilkan semua data)
+			$temp_siswa = $this->db->query("SELECT instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas FROM `instrumen_jawaban` GROUP BY instrumen_jawaban.nama_lengkap")->result_array();
+
+			$get_siswa = $this->Main_model->get('kelas_siswa');
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// Compare and unite Data from Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		} else if (empty($sekolah) && !empty($tahun_ajaran)) { //Sekolah kosong tahun ajaran ada , tampilkan semua data pada tahun ajaran tersebut
+
+			$temp_siswa = $this->Main_model->innerJoin('instrumen_jawaban', 'instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas', [[
+				'table' => 'kelas',
+				'parameter' => 'kelas.id = instrumen_jawaban.kelas',
+			]], ['kelas.tahun_ajaran' => $tahun_ajaran], '', '', '', 'instrumen_jawaban.nama_lengkap');
+
+			$get_siswa = $this->Main_model->innerJoin(
+				'kelas_siswa',
+				'kelas_siswa.*',
+				[[
+					'table' => 'kelas',
+					'parameter' => 'kelas.id = kelas_siswa.id_kelas',
+				]],
+				['kelas.tahun_ajaran' => $tahun_ajaran]
+			);
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// Compare and unite Data from Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		} else if (!empty($sekolah) && !empty($tahun_ajaran)) { //Semua terisi
+
+			$temp_siswa = $this->Main_model->innerJoin(
+				'instrumen_jawaban',
+				'instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas',
+				[[
+					'table' => 'kelas',
+					'parameter' => 'kelas.id = instrumen_jawaban.kelas',
+				], [
+					'table' => 'user_info',
+					'parameter' => 'kelas.user_id = user_info.id'
+				]],
+				[
+					'kelas.tahun_ajaran' => $tahun_ajaran,
+					'user_info.instansi' => $sekolah
+				],
+				'',
+				'',
+				'',
+				'instrumen_jawaban.nama_lengkap'
+			);
+
+			$get_siswa = $this->Main_model->innerJoin(
+				'kelas_siswa',
+				'kelas_siswa.*',
+				[[
+					'table' => 'kelas',
+					'parameter' => 'kelas.id = kelas_siswa.id_kelas',
+				], [
+					'table' => 'user_info',
+					'parameter' => 'kelas.user_id = user_info.id'
+				]],
+				['kelas.tahun_ajaran' => $tahun_ajaran, 'user_info.instansi' => $sekolah]
+			);
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// Compare and unite Data from Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		} else { //Kondisi lainnya
+			$temp_siswa = $this->Main_model->innerJoin('instrumen_jawaban', 'instrumen_jawaban.id as id,nis,instrumen_jawaban.nama_lengkap as nama,instrumen_jawaban.jenis_kelamin as jk, instrumen_jawaban.tanggal_lahir as tgl_lahir, whatsapp as no_telepon,email,instrumen_jawaban.kelas as id_kelas', [[
+				'table' => 'kelas',
+				'parameter' => 'kelas.id = instrumen_jawaban.kelas',
+			], [
+				'table' => 'user_info',
+				'parameter' => 'kelas.user_id = user_info.user_id'
+			]], ['user_info.instansi' => $sekolah], '', '', '', 'instrumen_jawaban.nama_lengkap');
+
+			$get_siswa = $this->Main_model->innerJoin('kelas_siswa', 'kelas_siswa.*', [[
+				'table' => 'kelas',
+				'parameter' => 'kelas.id = kelas_siswa.id_kelas',
+			], [
+				'table' => 'user_info',
+				'parameter' => 'kelas.user_id = user_info.user_id'
+			]], ['user_info.instansi' => $sekolah]);
+
+			// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+			if (empty($get_siswa)) {
+				$data_temp = $temp_siswa;
+			} else if (empty($temp_siswa)) {
+				$data_temp = $get_siswa;
+			} else if (!empty($get_siswa) && !empty($temp_siswa)) {
+				// mengcompare dan manyatukan 2 data agar mendapat data yang unique dari Kelas_siswa and instrumen_jawaban By Name
+				$i = 0;
+				$data_temp = $get_siswa;
+				foreach ($temp_siswa as $key => $val) {
+					foreach ($data_temp as $key1 => $val1) {
+						$same = false;
+						if ($val['nama'] == $val1['nama']) {
+							$same = true;
+							break;
+						}
+					}
+					if ($same == false) {
+						$data_temp[] = $temp_siswa[$i];
+					}
+					$i++;
+				}
+			}
+		}
+
+		$get_tahun_ajaran = $this->db->query("SELECT DISTINCT tahun_ajaran FROM kelas")->result_array();
+
+		// $getSekolah = $this->Main_model->get_where('user_info',);
+
+		$listData = $data_temp;
+
+		$this->load->library('fpdf_diag');
+
+		$pdf = new PDF_Diag();
+		$pdf->AddPage();
+		$pdf->SetLeftMargin(0);
+		$pdf->SetFont('Arial', '', 11);
+
+		// $pdf->Cell(5, 7, 'No', 1, 0, 'C');
+		// $pdf->Cell(20, 7, 'Nama', 1, 0, 'C');
+		// $pdf->Cell(20, 7, 'JK', 1, 0, 'C');
+		// $pdf->Cell(20, 7, 'Tanggal Lahir', 1, 0, 'C');
+		// $pdf->Cell(20, 7, 'Email dan No WA', 1, 1, 'C');
+		// $pdf->Cell(20, 7, 'Instansi - Kelas', 1, 1, 'C');
+		$pdf->SetWidths(array(10, 45, 10, 30, 30, 30, 30));
+		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C'));
+		$pdf->Row(array('No', 'Nama', 'JK', 'Tanggal Lahir', 'Email', 'No Whatsapp', 'Instansi - kelas'));
+		$i = 1;
+		foreach ($listData as $val) {
+			if ($val['jk'] == 'Laki-laki' || $val['jk'] == 'L') {
+				$jeniskelamin = 'L';
+			} else {
+				$jeniskelamin = 'P';
+			}
+			$get_kelas = $this->db->query("SELECT DISTINCT * FROM kelas JOIN user_info ON kelas.user_id = user_info.user_id WHERE kelas.id = " . $val['id_kelas'])->result_array();
+
+			if (!empty($get_kelas)) {
+				$sekolah = $get_kelas[0]['instansi'];
+				$kelas = $get_kelas[0]['kelas'];
+			} else {
+				$sekolah = 'No Data';
+				$kelas = 'Found';
+			}
+			$pdf->SetLeftMargin(10);
+			$pdf->Row(array($i, $val['nama'], $jeniskelamin, $val['tgl_lahir'], $val['email'], $val['no_telepon'], $sekolah . '-' . $kelas));
+			$i++;
+		}
+
+		$pdf->Output();
+	}
+}
 /* End of file Admin.php */
 /* Location: ./application/controllers/Admin.php */

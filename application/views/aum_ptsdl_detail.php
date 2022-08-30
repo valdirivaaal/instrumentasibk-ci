@@ -126,7 +126,7 @@
 		var tahun_ajaran = "<?= $get_kelas[0]['tahun_ajaran'] ?>";
 		var sekolah = "<?= $get_profil[0]['instansi'] ?>";
 		var urls = [];
-		$(".individu-download").each(function() {
+		$("#dynamic-table").DataTable().$(".individu-download").each(function() {
 			var url = $(this).attr('href');
 			var name = $(this).attr('data-nama');
 			urls.push({

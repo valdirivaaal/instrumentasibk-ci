@@ -286,9 +286,9 @@ class Auap extends CI_Controller
 		$pdf->Cell(2, 6, ':', 0, 0, 'C');
 		$pdf->Cell(30, 6, $total_peserta . ' Siswa', 0, 0, 'L');
 		$pdf->Cell(20);
-		$pdf->Cell(56, 6, 'Ini buat apa', 0, 0, 'L');
-		$pdf->Cell(2, 6, ':', 0, 0, 'C');
-		$pdf->Cell(10, 6, 'Apa ya', 0, 0, 'L');
+		// $pdf->Cell(56, 6, 'Ini buat apa', 0, 0, 'L');
+		// $pdf->Cell(2, 6, ':', 0, 0, 'C');
+		// $pdf->Cell(10, 6, 'Apa ya', 0, 0, 'L');
 
 		$pdf->Ln(8);
 		$pdf->SetFont('Arial', 'B', 12);

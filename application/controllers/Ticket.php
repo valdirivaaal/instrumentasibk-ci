@@ -30,7 +30,12 @@ class Ticket extends CI_Controller
 			$mod_date = strtotime($date . "+ " . $getKey[0]['masa_berlaku'] . " days");
 			$data['tgl_kadaluarsa'] = date("Y-m-d", $mod_date);
 			$data['date_created'] = date('Y-m-d H:i:s');
-			$event_key['status'] = 'Active';
+
+			if ($getKey[0]['key_type'] == 'single') {
+				$event_key['status'] = 'Active';
+			} else if ($getKey[0]['key_type'] == 'multi') {
+				$event_key['status'] = 'Inactive';
+			}
 
 			$this->Main_model->insert_data('ticket', $data);
 			$this->Main_model->update_data('event_key', $event_key, array('id' => $getKey[0]['id']));
@@ -53,10 +58,15 @@ class Ticket extends CI_Controller
 			$data['user_id'] = $this->session->userdata('id');
 			$data['event_key'] = $getKey[0]['id'];
 			$date = date("Y-m-d");
-			$mod_date = strtotime($date . "+ 365 days");
+			$mod_date = strtotime($date . "+ " . $getKey[0]['masa_berlaku'] . " days");
 			$data['tgl_kadaluarsa'] = date("Y-m-d", $mod_date);
 			$data['date_created'] = date('Y-m-d H:i:s');
-			$event_key['status'] = 'Active';
+
+			if ($getKey[0]['key_type'] == 'single') {
+				$event_key['status'] = 'Active';
+			} else if ($getKey[0]['key_type'] == 'multi') {
+				$event_key['status'] = 'Inactive';
+			}
 
 			$this->Main_model->insert_data('ticket', $data);
 			$this->Main_model->update_data('event_key', $event_key, array('id' => $getKey[0]['id']));
