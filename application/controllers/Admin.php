@@ -856,9 +856,9 @@ class Admin extends CI_Controller
 		// $pdf->Cell(20, 7, 'Tanggal Lahir', 1, 0, 'C');
 		// $pdf->Cell(20, 7, 'Email dan No WA', 1, 1, 'C');
 		// $pdf->Cell(20, 7, 'Instansi - Kelas', 1, 1, 'C');
-		$pdf->SetWidths(array(10, 45, 10, 30, 30, 30, 30));
-		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		$pdf->Row(array('No', 'Nama', 'JK', 'Tanggal Lahir', 'Email', 'No Whatsapp', 'Instansi - kelas'));
+		$pdf->SetWidths(array(10, 30, 10, 30, 30, 30, 25, 25));
+		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
+		$pdf->Row(array('No', 'Nama', 'JK', 'Tanggal Lahir', 'Email', 'No Whatsapp', 'Instansi', 'Kelas'));
 		$i = 1;
 		foreach ($listData as $val) {
 			if ($val['jk'] == 'Laki-laki' || $val['jk'] == 'L') {
@@ -876,7 +876,7 @@ class Admin extends CI_Controller
 				$kelas = 'Found';
 			}
 			$pdf->SetLeftMargin(10);
-			$pdf->Row(array($i, $val['nama'], $jeniskelamin, $val['tgl_lahir'], $val['email'], $val['no_telepon'], $sekolah . '-' . $kelas));
+			$pdf->Row(array($i, $val['nama'], $jeniskelamin, $val['tgl_lahir'], $val['email'], $val['no_telepon'], $sekolah, $kelas));
 			$i++;
 		}
 

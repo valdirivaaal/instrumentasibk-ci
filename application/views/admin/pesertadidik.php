@@ -66,7 +66,8 @@
 								<th>Tanggal Lahir</th>
 								<th>Email</th>
 								<th>Nomor Whatsapp</th>
-								<th>Instansi - Kelas</th>
+								<th>Instansi</th>
+								<th>Kelas</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -98,7 +99,8 @@
 									<td><?= $value['tgl_lahir'] ?></td>
 									<td><?= $value['email'] ?></td>
 									<td><?= $value['no_telepon'] ?></td>
-									<td><?= $sekolah  ?> - <?= $kelas ?></td>
+									<td><?= $sekolah  ?></td>
+									<td><?= $kelas ?></td>
 								</tr>
 							<?php
 								$i++;
