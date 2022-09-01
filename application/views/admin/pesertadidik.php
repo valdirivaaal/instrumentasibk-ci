@@ -52,7 +52,9 @@
 						</div>
 					</div>
 				</form>
-				<a id="download_all" href="<?= base_url('admin/download_narasumber?tahun_ajaran=') ?><?= isset($_GET['tahun_ajaran']) ? $_GET['tahun_ajaran'] : '' ?>&sekolah=<?= isset($_GET['sekolah']) ? $_GET['sekolah'] : '' ?>" class="btn btn-sm float-right ml-2 btn-primary"><i class="fa fa-download"></i> Download Daftar Narasumber</a>
+				<a id="download_all" href="<?= base_url('admin/download_narasumber?tahun_ajaran=') ?><?= isset($_GET['tahun_ajaran']) ? $_GET['tahun_ajaran'] : '' ?>&sekolah=<?= isset($_GET['sekolah']) ? $_GET['sekolah'] : '' ?>" class="btn btn-sm float-right ml-2 btn-primary"><i class="fa fa-download"></i> Download Daftar Narasumber PDF</a>
+
+				<a id="download_all" href="<?= base_url('admin/export_excel_narasumber?tahun_ajaran=') ?><?= isset($_GET['tahun_ajaran']) ? $_GET['tahun_ajaran'] : '' ?>&sekolah=<?= isset($_GET['sekolah']) ? $_GET['sekolah'] : '' ?>" class="btn btn-sm float-right ml-2 btn-success"><i class="fa fa-download"></i> Download Daftar Narasumber Excel</a>
 				<div class="adv-table table-responsive">
 					<table id="mytable" class="display table table-bordered table-striped dynamic-table">
 						<thead style="vertical-align : middle;text-align:center;">
