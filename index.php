@@ -286,4 +286,7 @@ define('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
  *
  * And away we go...
  */
+
+// Composer Autoload
+require FCPATH . 'vendor/autoload.php';
 require_once BASEPATH . 'core/CodeIgniter.php';
