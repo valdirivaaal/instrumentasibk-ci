@@ -1,8 +1,7 @@
 <?php
-defined('BASEPATH') or exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Ticket extends CI_Controller
-{
+class Ticket extends CI_Controller {
 
 	public function __construct()
 	{
@@ -16,59 +15,59 @@ class Ticket extends CI_Controller
 	public function save()
 	{
 		$post = $this->input->post();
-		$getProfil = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
-		if ($getProfil[0]['status'] == 'Guru BK') {
+		$getProfil = $this->Main_model->get_where('user_info',array('user_id'=>$this->session->userdata('id')));
+		if ($getProfil[0]['status']=='Guru BK') {
 			$tipe = 1;
 		} else {
 			$tipe = 2;
 		}
-		$getKey = $this->Main_model->get_where('event_key', array('event_key' => $post['event_key'], 'status' => 'Inactive', 'tipe' => $tipe));
+		$getKey = $this->Main_model->get_where('event_key',array('event_key'=>$post['event_key'],'status'=>'Inactive','tipe'=>$tipe));
 		if ($getKey) {
 			$data['user_id'] = $this->session->userdata('id');
 			$data['event_key'] = $getKey[0]['id'];
 			$date = date("Y-m-d");
-			$mod_date = strtotime($date . "+ " . $getKey[0]['masa_berlaku'] . " days");
-			$data['tgl_kadaluarsa'] = date("Y-m-d", $mod_date);
+			$mod_date = strtotime($date."+ 365 days");
+			$data['tgl_kadaluarsa'] = date("Y-m-d",$mod_date);
 			$data['date_created'] = date('Y-m-d H:i:s');
 			$event_key['status'] = 'Active';
 
-			$this->Main_model->insert_data('ticket', $data);
-			$this->Main_model->update_data('event_key', $event_key, array('id' => $getKey[0]['id']));
-			$this->session->set_flashdata('success', $post['event_key']);
-			$this->session->set_flashdata('msg', 'event key');
+			$this->Main_model->insert_data('ticket',$data);
+			$this->Main_model->update_data('event_key',$event_key,array('id'=>$getKey[0]['id']));
+			$this->session->set_flashdata('success','sukses');
+			$this->session->set_flashdata('msg','event key');
 			redirect('aum');
 		} else {
-			$this->session->set_flashdata('error', 'error');
-			$this->session->set_flashdata('msg', 'Event key tidak tersedia. Silahkan coba lagi.');
+			$this->session->set_flashdata('error','error');
+			$this->session->set_flashdata('msg','Event key tidak tersedia. Silahkan coba lagi.');
 			redirect('aum');
 		}
 	}
 
-	public function save_dcm()
-	{
+	public function save_dcm(){
 		$post = $this->input->post();
-		$getProfil = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
-		$getKey = $this->Main_model->get_where('event_key', array('event_key' => $post['event_key'], 'status' => 'Inactive', 'tipe' => 3));
+		$getProfil = $this->Main_model->get_where('user_info',array('user_id'=>$this->session->userdata('id')));
+		$getKey = $this->Main_model->get_where('event_key',array('event_key'=>$post['event_key'],'status'=>'Inactive','tipe'=>3));
 		if ($getKey) {
 			$data['user_id'] = $this->session->userdata('id');
 			$data['event_key'] = $getKey[0]['id'];
 			$date = date("Y-m-d");
-			$mod_date = strtotime($date . "+ 365 days");
-			$data['tgl_kadaluarsa'] = date("Y-m-d", $mod_date);
+			$mod_date = strtotime($date."+ 365 days");
+			$data['tgl_kadaluarsa'] = date("Y-m-d",$mod_date);
 			$data['date_created'] = date('Y-m-d H:i:s');
 			$event_key['status'] = 'Active';
 
-			$this->Main_model->insert_data('ticket', $data);
-			$this->Main_model->update_data('event_key', $event_key, array('id' => $getKey[0]['id']));
-			$this->session->set_flashdata('success', 'sukses');
-			$this->session->set_flashdata('msg', 'event key');
+			$this->Main_model->insert_data('ticket',$data);
+			$this->Main_model->update_data('event_key',$event_key,array('id'=>$getKey[0]['id']));
+			$this->session->set_flashdata('success','sukses');
+			$this->session->set_flashdata('msg','event key');
 			redirect('dcm');
 		} else {
-			$this->session->set_flashdata('error', 'error');
-			$this->session->set_flashdata('msg', 'Event key tidak tersedia. Silahkan coba lagi.');
+			$this->session->set_flashdata('error','error');
+			$this->session->set_flashdata('msg','Event key tidak tersedia. Silahkan coba lagi.');
 			redirect('dcm');
 		}
 	}
+
 }
 
 /* End of file Ticket.php */

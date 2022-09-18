@@ -12,28 +12,18 @@
 			</div>
 			<div class="card-body">
 				<?php
-				if ($this->session->flashdata('success')) {
-				?>
-					<div class="alert alert-success" role="alert">
-						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-						<strong>Berhasil!</strong> Eventkey <?= $this->session->flashdata('success') ?> Berhasil Digunakan.
-					</div>
-				<?php
-				}
-				?>
-				<?php
 				if ($this->session->flashdata('error')) {
-				?>
+					?>
 					<div class="alert alert-danger" role="alert">
 						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 						<strong>Gagal!</strong> <?= $this->session->flashdata('msg') ?>.
 					</div>
-				<?php
+					<?php
 				}
 				?>
 				<form action="<?= base_url('ticket/save') ?>" method="post">
 					<div class="form-group">
-						<label class="col-lg-12 control-label">Event Key</label>
+						<label  class="col-lg-12 control-label">Event Key</label>
 						<div class="col-md-12">
 							<div class="form-group">
 								<input type="hidden" name="controller" value="<?= getUrlCurrently() ?>">

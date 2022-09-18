@@ -12,8 +12,6 @@
 					<input type="hidden" name="instrumen_id" value="<?= $_GET['instrumen_id'] ?>">
 					<input type="hidden" name="nama_lengkap" value="<?= $_GET['nama_lengkap'] ?>">
 					<input type="hidden" name="jenis_kelamin" value="<?= $_GET['jenis_kelamin'] ?>">
-					<input type="hidden" name="email" value="<?= $_GET['email'] ?>">
-					<input type="hidden" name="whatsapp" value="<?= $_GET['whatsapp'] ?>">
 					<input type="hidden" name="nis" value="<?= $_GET['nis'] ?>">
 					<input type="hidden" name="kelas" value="<?= $_GET['kelas'] ?>">
 					<input type="hidden" name="tanggal_lahir" value="<?= $_GET['tanggal_lahir'] ?>">
@@ -21,44 +19,44 @@
 					<div class="col-md-12">
 						<ul class="nav nav-tabs d-none" id="myTab" role="tablist">
 							<?php
-							for ($i = 0; $i <= $jumlah_tab; $i++) {
-							?>
+							for ($i=0; $i <= $jumlah_tab; $i++) {
+								?>
 								<li class="nav-item">
-									<a class="nav-link <?= ($i == 0) ? 'active' : '' ?>" id="step-1" data-toggle="tab" href="#tab<?= $i ?>" role="tab" aria-controls="home" aria-selected="true">Tahap <?= $i ?></a>
+									<a class="nav-link <?= ($i==0) ? 'active' : '' ?>" id="step-1" data-toggle="tab" href="#tab<?= $i ?>" role="tab" aria-controls="home" aria-selected="true">Tahap <?= $i ?></a>
 								</li>
-							<?php
+								<?php
 							}
 							?>
 							<li class="nav-item">
-								<a class="nav-link" id="step-2" data-toggle="tab" href="#tab<?= $jumlah_tab + 1 ?>" role="tab" aria-controls="profile" aria-selected="false">Tahap <?= $jumlah_tab + 1 ?></a>
+								<a class="nav-link" id="step-2" data-toggle="tab" href="#tab<?= $jumlah_tab+1 ?>" role="tab" aria-controls="profile" aria-selected="false">Tahap <?= $jumlah_tab+1 ?></a>
 							</li>
 						</ul>
 						<div class="tab-content" id="myTabContent">
 							<?php
-							for ($i = 0; $i <= $jumlah_tab; $i++) {
-							?>
-								<div class="tab-pane <?= ($i == 0) ? 'active' : '' ?>" id="tab<?= $i ?>">
+							for ($i=0; $i <= $jumlah_tab; $i++) {
+								?>
+								<div class="tab-pane <?= ($i==0) ? 'active' : '' ?>" id="tab<?= $i ?>">
 									<div class="alert alert-danger" role="alert">
-										<h3 class="font-weight-bold mt-3">Tahap 2, baca petunjuk pengisian :</h3>
+										<h3 class="font-weight-bold mt-3">Tahap 2, baca petunjuk pengisian :</h3> 
 										<p class="text-justify">Lihatlah kembali masalah-masalah yang telah Anda tandai yang menjadi keluhan dan gangguan bagi Anda. Dari masalah-masalah tersebut, mana sajakah yang Anda rasakan amat berat atau amat mengganggu dengan mengubah tombol berwarna merah menjadi hijau. Selamat mengerjakan.</p>
 									</div>
 									<?php
 									foreach ($jawaban[$i] as $key => $value) {
-										$get_pernyataan = $this->Main_model->get_where('instrumen_pernyataan', array('id' => $key));
+										$get_pernyataan = $this->Main_model->get_where('instrumen_pernyataan',array('id'=>$key));
 										foreach ($get_pernyataan as $pernyataan) {
-									?>
+											?>
 											<hr>
 											<div class="row container">
 												<div class="col-md-10">
 													<h5><?= $pernyataan['pernyataan'] ?></h5>
 												</div>
 												<div class="col-md-2 text-center">
-													<div class="make-switch mt-3" data-on="success" data-off="danger">
+													<div class="make-switch mt-3" data-on="success"  data-off="danger">
 														<input type="checkbox" name="jawaban_berat[<?= $pernyataan['id'] ?>]" value="Ya">
 													</div>
 												</div>
 											</div>
-									<?php
+											<?php
 										}
 									}
 									?>
@@ -66,12 +64,12 @@
 										<button type="button" class="btn btn-success btnStep<?= $i ?>">Selanjutnya</button>
 									</div>
 								</div>
-							<?php
+								<?php
 							}
 							?>
-							<div class="tab-pane fade" id="tab<?= $jumlah_tab + 1 ?>">
+							<div class="tab-pane fade" id="tab<?= $jumlah_tab+1 ?>">
 								<div class="alert alert-warning" role="alert">
-									<h5 class="font-weight-bold mt-3">Petunjuk Pengisian :</h5>
+									<h5 class="font-weight-bold mt-3">Petunjuk Pengisian :</h5> 
 									<p>Jawablah tiga pertanyaan berikut ini.</p>
 								</div>
 								<hr>
@@ -80,7 +78,7 @@
 										<h5>Apakah masalah-masalah yang anda tandai itu benar-benar menggambarkan keseluruhan masalah yang Anda hadapi sekarang?</h5>
 									</div>
 									<div class="col-md-2 text-center">
-										<div class="make-switch mt-3" data-on="success" data-off="danger">
+										<div class="make-switch mt-3" data-on="success"  data-off="danger">
 											<input type="checkbox" name="jawaban_deskriptif[221]" value="Ya">
 										</div>
 									</div>
@@ -110,7 +108,7 @@
 											<option value="Lain-lain">Lain-Lain</option>
 											<option value="Tidak Ingin">Tidak Ingin</option>
 										</select>
-									</div>
+									</div>	
 								</div>
 								<hr>
 								<div class="form-group text-center col-lg-10 offset-1">
@@ -130,17 +128,15 @@
 	var jumlah_tab = <?= $jumlah_tab ?>;
 
 	for (i = 0; i <= jumlah_tab; i++) {
-		$('.btnStep' + i).click(function() {
+		$('.btnStep' + i).click(function(){
 			var $id = $('.nav-tabs > .nav-item > .active').parent().next('li').find('a').trigger('click');
-			jQuery('html,body').animate({
-				scrollTop: 0
-			}, 0);
+			jQuery('html,body').animate({scrollTop:0},0);
 		});
 
-	}
+	}	
 
-	$('.make-switch').change(function() {
-		if ($("#question-cerita").is(":checked") == true) {
+	$('.make-switch').change(function(){
+		if($("#question-cerita").is(":checked")==true){
 			$("#cerita").attr("placeholder", "Kepada siapa biasanya kamu menceritakan masalahmu?");
 		} else {
 			$("#cerita").attr("placeholder", "Apa alasanmu tidak menceritakan masalahmu?");
