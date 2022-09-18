@@ -8,7 +8,6 @@ class Ptsdl extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
-		$this->load->model('GetModel');
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
@@ -34,9 +33,7 @@ class Ptsdl extends CI_Controller
 
 		$data['jenjang'] =  $jenjang;
 
-		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')), 'id', 'DESC', 1);
-
-		$day_remaining = 0;
+		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')));
 
 		if ($get_ticket) {
 			if ($jenjang) {
@@ -44,16 +41,11 @@ class Ptsdl extends CI_Controller
 			} else {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id')), 'kelas', 'asc');
 			}
-			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 			$data['content'] = 'aum_ptsdl.php';
 		} else {
 			$data['content'] = 'key';
 		}
 
-		if ($day_remaining <= 0) {
-
-			$data['content'] = 'key';
-		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -126,22 +118,7 @@ class Ptsdl extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUM PTSDL', 'jenjang' => $data['get_profil'][0]['jenjang']));
 		$get_aum = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_aum[0]['id'], 'kelas' => $id));
-		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
-
-		$get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
-		$day_remaining = 0;
-
-		if ($get_ticket) {
-			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
-			$data['content'] = 'aum_ptsdl_detail.php';
-		} else {
-			$data['content'] = 'key';
-		}
-
-		if ($day_remaining <= 0) {
-
-			$data['content'] = 'key';
-		}
+		$data['content'] = 'aum_ptsdl_detail.php';
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -159,19 +136,6 @@ class Ptsdl extends CI_Controller
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
-		if (!$get_data) {
-			show_error('Error When Fetch data', 500);
-		}
-
-		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
-			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
-			if (!$get_data_logo) {
-				$get_data_logo = '';
-			}
-		} else {
-			$get_data_logo = '';
-		}
-
 		$total_peserta = 0;
 		foreach ($get_kelas as $key => $value) {
 			$total_peserta += $value['jumlah_siswa'];
@@ -182,19 +146,15 @@ class Ptsdl extends CI_Controller
 			$jawaban_berat = unserialize($value['jawaban_berat']);
 		}
 
-		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
-
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 
 		$pdf->SetFont('Arial', '', 11);
-		if (!empty($get_data_logo)) {
-			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
-		} else if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
+		if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
 		} else {
-			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
+			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -241,7 +201,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -356,7 +316,7 @@ class Ptsdl extends CI_Controller
 		$yScale = $maxTotal / $chartHeight;
 		$barWidth = (1 / $xScale) / 1.5;
 
-		$pdf->ColumnChart2($chartWidth, $chartHeight, $data, null, array(255, 175, 100));
+		$pdf->ColumnChart($chartWidth, $chartHeight, $data, null, array(255, 175, 100));
 
 		for ($i = 0; $i < count($rowLabels); $i++) {
 			$pdf->SetXY($chartXPos + 50 +  $i / $xScale, $chartYPos);
@@ -429,7 +389,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(25, 20, 20, 71, 18, 18));
 		$pdf->SetAligns(array('C', 'C', 'C', 'L', 'C', 'C'));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
@@ -471,7 +431,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(185, 6, 'Tabel 3. Skor Item PTSDL Tertinggi Dalam Kelompok', 0, 0, 'C');
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		arsort($sumArray);
 
@@ -504,7 +464,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(185, 6, 'Tabel 4. Item Masalah PTSDL Tertinggi Dalam Kelompok', 0, 0, 'C');
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		arsort($sumArrayMasalah);
 
@@ -536,7 +496,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -604,7 +564,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -716,7 +676,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetWidths(array(25, 10, 10, 10, 6, 6, 6, 6, 6, 12, 12, 12, 13, 13, 25));
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		foreach ($array_jawaban as $value) {
 			foreach ($value as $key2 => $value2) {
@@ -812,38 +772,20 @@ class Ptsdl extends CI_Controller
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
-
-		if (!$get_data) {
-			show_error('Error When Fetch data', 500);
-		}
-
-		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
-			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
-			if (!$get_data_logo) {
-				$get_data_logo = '';
-			}
-		} else {
-			$get_data_logo = '';
-		}
-
 		foreach ($get_data as $key => $value) {
 			$jawaban[] = unserialize($value['jawaban']);
 			$jawaban_berat = unserialize($value['jawaban_berat']);
 		}
-
-		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
 
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 
 		$pdf->SetFont('Arial', '', 11);
-		if (!empty($get_data_logo)) {
-			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
-		} else if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
+		if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
 		} else {
-			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
+			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -890,7 +832,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1077,7 +1019,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(25, 20, 20, 71, 18, 18));
 		$pdf->SetAligns(array('C', 'C', 'C', 'L', 'C', 'C'));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
@@ -1118,7 +1060,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(185, 6, 'Tabel 3. Skor Item Komponen PTSDL Tertinggi Dalam Kelompok', 0, 0, 'C');
 		$pdf->Ln();
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		arsort($sumArray);
 
@@ -1151,7 +1093,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -1214,7 +1156,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Cell(50, 6, '1. Item Masalah Komponen PTSDL Paling Dominan Dalam Kelompok', 0, 1, 'L');
 		$pdf->Cell(185, 6, 'Tabel 5. Item Masalah Komponen PTSDL Paling Dominan Dalam Kelompok', 0, 1, 'C');
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		arsort($sumArrayMasalah);
 
@@ -1246,7 +1188,7 @@ class Ptsdl extends CI_Controller
 
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->SetWidths(array(70, 100));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 		$pdf->SetAligns(array('L', 'L'));
 		$pdf->Cell(6, 7, '', 0, 0, 'L');
 
@@ -1358,7 +1300,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetWidths(array(25, 10, 10, 10, 6, 6, 6, 6, 6, 12, 12, 12, 13, 13, 25));
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		foreach ($array_jawaban as $value) {
 			foreach ($value as $key2 => $value2) {
@@ -1455,21 +1397,6 @@ class Ptsdl extends CI_Controller
 		$jawaban = unserialize($get_profil[0]['jawaban']);
 		$jawaban_mentah = unserialize($get_profil[0]['jawaban']);
 
-		if (!$get_profil) {
-			show_error('Error When Fetch data', 500);
-		}
-
-		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
-			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
-			if (!$get_data_logo) {
-				$get_data_logo = '';
-			}
-		} else {
-			$get_data_logo = '';
-		}
-
-		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
-
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
@@ -1529,12 +1456,10 @@ class Ptsdl extends CI_Controller
 
 
 		$pdf->SetFont('Arial', '', 11);
-		if (!empty($get_data_logo)) {
-			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
-		} else if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
+		if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
 		} else {
-			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
+			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -1581,7 +1506,7 @@ class Ptsdl extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN 2020/2021', 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1704,11 +1629,11 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(25, 20, 20, 71, 18, 18));
 		$pdf->SetAligns(array('C', 'C', 'C', 'L', 'C', 'C'));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
-			$array_no_masalah[$value_aspek['kode_aspek']] = array();
+			$array_no_masalah = array();
 
 			foreach ($get_butir as $key => $value) {
 				if ($jawaban[$value['id']] == 'Masalah') {
@@ -1836,7 +1761,7 @@ class Ptsdl extends CI_Controller
 		$pdf->SetFont('Arial', '', 8);
 		$pdf->SetWidths(array(25, 10, 10, 10, 30, 12, 12, 12, 13, 13, 25));
 		$pdf->SetAligns(array('C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		// srand(microtime() * 1000000);
+		srand(microtime() * 1000000);
 
 		$pdf->SetLeftMargin(16);
 		foreach ($get_aspek as $value_aspek) {

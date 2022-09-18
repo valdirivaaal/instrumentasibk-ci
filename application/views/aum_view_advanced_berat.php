@@ -11,8 +11,6 @@
 					<input type="hidden" name="instrumen_id" value="<?= $_GET['instrumen_id'] ?>">
 					<input type="hidden" name="nama_lengkap" value="<?= $_GET['nama_lengkap'] ?>">
 					<input type="hidden" name="jenis_kelamin" value="<?= $_GET['jenis_kelamin'] ?>">
-					<input type="hidden" name="email" value="<?= $_GET['email'] ?>">
-					<input type="hidden" name="whatsapp" value="<?= $_GET['whatsapp'] ?>">
 					<input type="hidden" name="nis" value="<?= $_GET['nis'] ?>">
 					<input type="hidden" name="kelas" value="<?= $_GET['kelas'] ?>">
 					<input type="hidden" name="tanggal_lahir" value="<?= $_GET['tanggal_lahir'] ?>">
@@ -20,7 +18,7 @@
 
 					<div class="col-md-12">
 						<div class="alert alert-warning" role="alert">
-							<h5 class="font-weight-bold mt-3">Petunjuk Pengisian :</h5>
+							<h5 class="font-weight-bold mt-3">Petunjuk Pengisian :</h5> 
 							<p>Lihatlah kembali masalah-masalah yang telah Anda tandai yang menjadi keluhan dan gangguan bagi Anda. Dari masalah-masalah tersebut, manasajakah yang Anda rasakan amat berat atau amat mengganggu dengan mengubah tombol berwarna merah menjadi hijau. Selamat mengerjakan.</p>
 						</div>
 					</div>

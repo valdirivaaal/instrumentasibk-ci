@@ -84,9 +84,9 @@ class Main_model extends CI_Model
 			$this->db->where($params);
 		}
 		$this->db->distinct();
-		$this->db->group_by($group_by);
 		$this->db->order_by($sort, $order);
 		$this->db->limit($limit, $offset);
+		$this->db->group_by($group_by);
 
 		if ($like) {
 			foreach ($like as $resultLike) {
@@ -196,26 +196,6 @@ class Main_model extends CI_Model
 			$kd = "1";
 		}
 		return $kd;
-	}
-
-	public function getTahunAjaran()
-	{
-		$yearNow = date('Y');
-		$yearBefore = $yearNow - 1;
-		$yearAfter = $yearNow + 1;
-		$data = $this->get_where('tahun_ajaran', ['id' => 1]);
-
-		if (date('m') >= 7) {
-			$tahun_ajaran = $yearNow . '/' . $yearAfter;
-		} else {
-			$tahun_ajaran = $yearBefore . '/' . $yearNow;
-		}
-
-		if ($data[0]['status'] == 'Aktif') {
-			return $data[0]['tahun_ajaran'];
-		} else {
-			return $tahun_ajaran;
-		}
 	}
 }
 
