@@ -16,9 +16,9 @@ class Instrumen extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('id' => $data['get_kode'][0]['instrumen_id']));
 		$get_profil = $this->Main_model->get_where('user_info', array('user_id' => $data['get_kode'][0]['user_id']));
 		if ($get_profil[0]['status'] == 'Guru BK') {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		} else {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		}
 		$data['content'] = 'aum_view.php';
 		$data['tipe_member'] = 'siswa';
@@ -32,9 +32,9 @@ class Instrumen extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('id' => $data['get_kode'][0]['instrumen_id']));
 		$get_profil = $this->Main_model->get_where('user_info', array('user_id' => $data['get_kode'][0]['user_id']));
 		if ($get_profil[0]['status'] == 'Guru BK') {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		} else {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		}
 		$data['content'] = 'ptsdl_view.php';
 		$data['tipe_member'] = 'siswa';
@@ -48,9 +48,9 @@ class Instrumen extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('id' => $data['get_kode'][0]['instrumen_id']));
 		$get_profil = $this->Main_model->get_where('user_info', array('user_id' => $data['get_kode'][0]['user_id']));
 		if ($get_profil[0]['status'] == 'Guru BK') {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		} else {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		}
 		$data['get_aspek'] = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $data['get_kode'][0]['instrumen_id']));
 		$data['content'] = 'auap_view.php';
@@ -65,9 +65,9 @@ class Instrumen extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('id' => $data['get_kode'][0]['instrumen_id']));
 		$get_profil = $this->Main_model->get_where('user_info', array('user_id' => $data['get_kode'][0]['user_id']));
 		if ($get_profil[0]['status'] == 'Guru BK') {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		} else {
-			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang']));
+			$data['get_kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $data['get_kode'][0]['user_id'], 'jenjang' => $get_instrumen[0]['jenjang'], 'tahun_ajaran' => $this->Main_model->getTahunAjaran()));
 		}
 		$data['content'] = 'dcm_view.php';
 		$data['tipe_member'] = 'siswa';

@@ -89,7 +89,7 @@ class Profil extends CI_Controller
 		$this->session->set_flashdata('success', 'profil');
 		redirect('profil');
 	}
-
+  
 	public function upload()
 	{
 		if (!is_dir('uploads/foto_profil/' . $this->session->userdata('id'))) {
@@ -114,7 +114,7 @@ class Profil extends CI_Controller
 			redirect('profil');
 		}
 	}
-
+  
 	public function hapus_foto($id = "")
 	{
 		$get_profil = $this->Main_model->get_where('user_info', array('user_id' => $id));
@@ -149,6 +149,7 @@ class Profil extends CI_Controller
 	{
 		$data['content'] = 'kop_surat.php';
 		$data['get_kopsurat'] = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
+		$data['get_logo'] = $this->Main_model->get('logo_daerah');
 
 		$this->load->view('main.php', $data, FALSE);
 	}

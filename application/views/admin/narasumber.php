@@ -33,38 +33,49 @@
 						<thead>
 							<tr>
 								<th>No</th>
-								<th>Nama Pengguna</th>
+								<th>Nama Narasumber</th>
 								<th>Email</th>
-								<th>Password</th>
+								<th>Asal Sekolah</th>
+								<th>Kelas</th>
+								<th>Tanggal Lahir</th>
 								<th>Nomor Whatsapp</th>
-								<th>Jenjang</th>
-								<th>Instansi</th>
-								<th>Event Key</th>
-								<th>Sisa Hari</th>
+								<th>Instrumen</th>
 								<th>Action</th>
 							</tr>
 						</thead>
 						<tbody>
 							<?php
 							$i =  1;
-							foreach ($get_user as $key => $value) {
-								$get_data = $this->GetModel->getLastTicket($value['user_id']);
+							foreach ($get_narsum as $key => $value) {
 								// $get_data = $get_data[0];
 
+								if ($value['nickname'] == 'AUM Umum') {
+									$instrum = 'aum';
+								} else if ($value['nickname'] == 'AUAP') {
+									$instrum = 'auap';
+								} else if ($value['nickname'] == 'AUM PTSDL') {
+									$instrum = 'ptsdl';
+								} else if ($value['nickname'] == 'DCM') {
+									$instrum = 'dcm';
+								} else {
+									$instrum = '';
+								}
 							?>
 								<tr class="gradeX">
 									<td><?= $i++ ?></td>
-									<td><?= $value['nama_lengkap'] ?></td>
-									<td><?= $value['email'] ?></td>
-									<td><?= $value['password'] ?></td>
-									<td><?= $value['no_whatsapp'] ?></td>
-									<td><?= $value['jenjang'] ?></td>
+									<td><?= $value['nama_narasumber'] ?></td>
+									<td><?= $value['email_narasumber'] ?></td>
 									<td><?= $value['instansi'] ?></td>
-									<td><?= !empty($get_data) ? $get_data[0]['event_key']  : '-' ?></td>
-									<td><?= !empty($get_data) ? ceil((strtotime($get_data[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24)) . ' Hari' : 'Tidak Aktif'; ?></td>
-									<td>
-										<a href="<?= base_url('admin/user/edit/' . $value['user_id']) ?>" class="btn btn-info">Edit</a>
-										<button onclick="deletealert(this)" data-id="<?= $value['user_id'] ?>" class="btn btn-danger delete-alert<?= $value['user_id'] ?>">Hapus</button>
+									<td><?= $value['kelas'] ?></td>
+									<td><?= $value['tanggal_lahir'] ?></td>
+									<td><?= $value['whatsapp'] ?></td>
+									<td><?= $value['nickname'] ?> - <?= $value['jenjang_instrumen'] ?></td>
+									<td><?php if (!empty($instrum)) { ?>
+											<a href="<?= base_url($instrum . '/laporan_individu/' . $value['id_narasumber']) ?>" class="btn btn-info">Download Laporan</a>
+										<?php } else { ?>
+											<a href="<?= base_url($instrum . '/laporan_individu/' . $value['id_narasumber']) ?>" class="btn btn-info" role="button" aria-disabled="true">Laporan tidak tersedia</a>
+										<?php } ?>
+										<button onclick="deletealert(this)" data-id="<?= $value['id_narasumber'] ?>" class="btn btn-danger delete-alert<?= $value['id_narasumber'] ?>">Hapus</button>
 									</td>
 
 								</tr>
@@ -84,7 +95,7 @@
 		var id = data.getAttribute("data-id");
 		swal.fire({
 			title: 'Apakah kamu yakin?',
-			text: "Kamu tidak bisa mengembalikan data setelah terhapus!",
+			text: "Kamu juga akan menghapus jawaban Narasumber Tersebut,Data yang sudah dihapus tidak dapat dikembalikan",
 			type: 'warning',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
@@ -94,7 +105,7 @@
 			if (result.value) {
 				$.ajax({
 					type: "POST",
-					url: "<?= base_url('hapus/user_admin/') ?>" + id,
+					url: "<?= base_url('hapus/narasumber/') ?>" + id,
 					cache: false,
 					success: function(response) {
 						swal.fire({
