@@ -89,7 +89,32 @@ class Profil extends CI_Controller
 		$this->session->set_flashdata('success', 'profil');
 		redirect('profil');
 	}
+  
+	public function upload()
+	{
+		if (!is_dir('uploads/foto_profil/' . $this->session->userdata('id'))) {
+			mkdir('uploads/foto_profil/' . $this->session->userdata('id'), 0777, true);
+		}
 
+		$config['upload_path']          = 'uploads/foto_profil/' . $this->session->userdata('id');
+		$config['allowed_types']        = 'gif|jpg|png';
+		$config['encrypt_name']			= TRUE;
+		$config['max_size']             = 2000;
+
+		$this->load->library('upload', $config);
+		$this->upload->initialize($config);
+		if (!$this->upload->do_upload('uploaded_img')) {
+			$this->session->set_flashdata('error', $this->upload->display_errors());
+			redirect('profil');
+		} else {
+			$fileData = $this->upload->data();
+			$post['foto'] = $fileData['file_name'];
+			$this->Main_model->update_data('user_info', $post, array('user_id' => $this->session->userdata('id')));
+			$this->session->set_flashdata('success', 'foto profil');
+			redirect('profil');
+		}
+	}
+  
 	public function hapus_foto($id = "")
 	{
 		$get_profil = $this->Main_model->get_where('user_info', array('user_id' => $id));
