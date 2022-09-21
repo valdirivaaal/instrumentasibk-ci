@@ -8,9 +8,11 @@ class Aum extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
 		}
+		ini_set('memory_limit', '8192M');
 	}
 
 	public function GenerateWord()
@@ -37,7 +39,7 @@ class Aum extends CI_Controller
 	{
 		// $this->load->library('encrypt');
 		$this->load->library('encryption');
-		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')));
+		$get_ticket = $this->Main_model->get_where('ticket', array('user_id' => $this->session->userdata('id')), 'id', 'DESC', 1);
 		$data['get_profil'] = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 
 		if ($jenjang) {
@@ -55,7 +57,10 @@ class Aum extends CI_Controller
 
 		$data['jenjang'] =  $jenjang;
 
+		$day_remaining = 0;
+
 		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 			if ($jenjang) {
 				$data['kelas'] = $this->Main_model->get_where('kelas', array('user_id' => $this->session->userdata('id'), 'jenjang' => $jenjang), 'kelas', 'asc');
 			} else {
@@ -66,7 +71,10 @@ class Aum extends CI_Controller
 			$data['content'] = 'key';
 		}
 
+		if ($day_remaining <= 0) {
 
+			$data['content'] = 'key';
+		}
 		$this->load->view('main.php', $data, FALSE);
 	}
 
@@ -89,9 +97,23 @@ class Aum extends CI_Controller
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUM Umum', 'jenjang' => $data['get_profil'][0]['jenjang']));
 
 		$get_aum = $this->Main_model->get_where('user_instrumen', array('user_id' => $this->session->userdata('id'), 'instrumen_id' => $get_instrumen[0]['id']));
-
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
 		$data['get_jawaban'] = $this->Main_model->get_where('instrumen_jawaban', array('instrumen_id' => $get_aum[0]['id'], 'kelas' => $id));
-		$data['content'] = 'aum_detail.php';
+
+		$get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
+		$day_remaining = 0;
+
+		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+			$data['content'] = 'aum_detail.php';
+		} else {
+			$data['content'] = 'key';
+		}
+
+		if ($day_remaining <= 0) {
+
+			$data['content'] = 'key';
+		}
 
 		$this->load->view('main.php', $data, FALSE);
 	}
@@ -164,6 +186,21 @@ class Aum extends CI_Controller
 		$get_kelas = $this->Main_model->get_where_in('kelas', 'id', explode(",", $get_kelompok[0]['kelas']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
+
+		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
+			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
+			if (!$get_data_logo) {
+				$get_data_logo = '';
+			}
+		} else {
+			$get_data_logo = '';
+		}
+
 		$total_peserta = 0;
 		foreach ($get_kelas as $key => $value) {
 			$total_peserta += $value['jumlah_siswa'];
@@ -216,10 +253,12 @@ class Aum extends CI_Controller
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
-		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+		if (!empty($get_data_logo)) {
+			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
+		} else if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -265,7 +304,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -452,7 +491,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetWidths(array(40, 18, 18, 18, 18, 18, 18, 18));
 		$pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		foreach ($get_aspek as $key => $value) {
 			$pdf->Cell(12, 7, '', 0, 0, 'L');
@@ -558,7 +597,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 		arsort($sumArrayBerat);
@@ -591,7 +630,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->Cell(8, 7, '', 0, 0, 'L');
 		$pdf->SetAligns(array('C', 'C', 'C', 'C'));
@@ -639,6 +678,22 @@ class Aum extends CI_Controller
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $id));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
+
+		if (!$get_data) {
+			show_error('Error When Fetch data', 500);
+		}
+
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
+		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
+			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
+			if (!$get_data_logo) {
+				$get_data_logo = '';
+			}
+		} else {
+			$get_data_logo = '';
+		}
+
 
 		foreach ($get_data as $key => $value) {
 			$jawaban = unserialize($value['jawaban']);
@@ -689,10 +744,12 @@ class Aum extends CI_Controller
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
-		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+		if (!empty($get_data_logo)) {
+			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
+		} else if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -738,7 +795,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -925,7 +982,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->SetWidths(array(40, 18, 18, 18, 18, 18, 18, 18));
 		$pdf->SetAligns(array('L', 'C', 'C', 'C', 'C', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 
 		foreach ($get_aspek as $key => $value) {
@@ -1031,7 +1088,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		arsort($sumArray);
 		arsort($sumArrayBerat);
@@ -1063,7 +1120,7 @@ class Aum extends CI_Controller
 
 		$pdf->Ln(8);
 		$pdf->SetWidths(array(20, 90, 30, 30));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 
 		$pdf->Cell(8, 7, '', 0, 0, 'L');
 		$pdf->SetAligns(array('C', 'C', 'C', 'C'));
@@ -1104,24 +1161,44 @@ class Aum extends CI_Controller
 		$get_kelas = $this->Main_model->get_where('kelas', array('id' => $get_profil[0]['kelas']));
 		$get_user = $this->Main_model->get_where('user_info', array('user_id' => $this->session->userdata('id')));
 		$get_surat = $this->Main_model->get_where('user_surat', array('user_id' => $this->session->userdata('id')));
+
+		if (!$get_profil) {
+			show_error('Error When Fetch data', 500);
+		}
+
 		if ($get_user[0]['jenjang'] == 'Konselor') {
 			$get_kelas = $this->Main_model->get_where('kelas', array('id' => $get_profil[0]['kelas']));
 			$get_user[0]['jenjang'] = $get_kelas[0]['jenjang'];
 		}
+
+		if ($get_surat[0]['logo'] != 'other' || $get_surat[0]['logo'] != '') {
+			$get_data_logo = $this->Main_model->get_where('logo_daerah', ['id' => $get_surat[0]['logo']]);
+			if (!$get_data_logo) {
+				$get_data_logo = '';
+			}
+		} else {
+			$get_data_logo = '';
+		}
+
 		$get_instrumen = $this->Main_model->get_where('instrumen', array('nickname' => 'AUM Umum', 'jenjang' => $get_user[0]['jenjang']));
 		$get_aspek = $this->Main_model->get_where('instrumen_aspek', array('instrumen_id' => $get_instrumen[0]['id']));
 		$jawaban = unserialize($get_profil[0]['jawaban']);
 		$jawaban_berat = unserialize($get_profil[0]['jawaban_berat']);
 		$jawaban_deskriptif = unserialize($get_profil[0]['jawaban_deskriptif']);
 
+		$tahun_ajaran = $get_kelas[0]['tahun_ajaran'] ?  $get_kelas[0]['tahun_ajaran'] : $this->Main_model->getTahunAjaran();
+
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
 		$pdf->SetLeftMargin(0);
 		$pdf->SetFont('Arial', '', 11);
-		if (@$get_surat[0]['logo_kiri']) {
-			$pdf->Image(base_url('uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri']), 4, 10, 35, 27);
+
+		if (!empty($get_data_logo)) {
+			$pdf->Image('./uploads/logo/' . $get_data_logo[0]['path'], 4, 10, 35, 27);
+		} else if (@$get_surat[0]['logo_kiri']) {
+			$pdf->Image('./uploads/logo/' . $get_surat[0]['user_id'] . '/' . $get_surat[0]['logo_kiri'], 4, 10, 35, 27);
 		} else {
-			$pdf->Image(base_url('assets/img/logo_iki.png'), 8, 6, 30, 27);
+			$pdf->Image('./assets/img/logo_iki.png', 8, 6, 30, 27);
 		}
 
 		if (@$get_surat[0]['logo_kanan']) {
@@ -1167,7 +1244,7 @@ class Aum extends CI_Controller
 		$pdf->Ln();
 		$pdf->Cell(185, 6, strtoupper(getField('user_info', 'instansi', array('id' => $this->session->userdata('id')))), 0, 0, 'C');
 		$pdf->Ln();
-		$pdf->Cell(185, 6, 'TAHUN AJARAN 2019/2020', 0, 0, 'C');
+		$pdf->Cell(185, 6, 'TAHUN AJARAN ' . $tahun_ajaran, 0, 0, 'C');
 
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->Ln(10);
@@ -1212,7 +1289,7 @@ class Aum extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 
 		foreach ($get_aspek as $value_aspek) {
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = array();
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
 			foreach ($get_butir as $key => $value) {
 				if (@$jawaban[$value['id']]) {
@@ -1352,12 +1429,12 @@ class Aum extends CI_Controller
 		$pdf->SetFont('Arial', '', 12);
 		$pdf->SetWidths(array(10, 45, 50, 15, 15, 37));
 		$pdf->SetAligns(array('C', 'L', 'L', 'C', 'C', 'C'));
-		srand(microtime() * 1000000);
+		// srand(microtime() * 1000000);
 		$i = 1;
 
 		foreach ($get_aspek as $value_aspek) {
 			$get_butir = $this->Main_model->get_where('instrumen_pernyataan', array('aspek_id' => $value_aspek['id']));
-			$array_no_masalah = array();
+			$array_no_masalah[$value_aspek['kode_aspek']] = array();
 			$array_masalah_berat = array();
 			foreach ($get_butir as $key => $value) {
 				if (@$jawaban[$value['id']]) {
@@ -1390,7 +1467,7 @@ class Aum extends CI_Controller
 			$pdf->Ln(8);
 			$pdf->Cell(6, 7, '', 0, 0, 'L');
 			$pdf->SetWidths(array(20, 121, 30));
-			srand(microtime() * 1000000);
+			// srand(microtime() * 1000000);
 			$pdf->SetAligns(array('C', 'C', 'C', 'C'));
 			$pdf->Row(array('No Item', 'Pernyataan', 'Bidang'));
 			$pdf->SetFont('Arial', '', 12);
