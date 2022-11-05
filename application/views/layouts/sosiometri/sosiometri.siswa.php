@@ -10,6 +10,16 @@
 				<h1 class="font-weight-bold">Angket Siswa</h1>
 			</div>
 			<div class="card-body">
+				<?php
+				if ($this->session->flashdata('success')) {
+				?>
+					<div class="alert alert-success" role="alert">
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						<strong>Sukses!</strong> Data <?= $this->session->userdata('success') ?> berhasil disimpan.
+					</div>
+				<?php
+				}
+				?>
 				<form action="<?php echo base_url('sosiometrisiswa/angketSiswa'); ?>" class="form-horizontal" method="post">
 					<input type="hidden" name="id_sosiometri" value="<?php echo $config['id']; ?>">
 					<div class="form-group">
