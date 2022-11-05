@@ -314,7 +314,10 @@ class Sosiometri extends CI_Controller
 	public function getGenderCount($data)
 	{
 		if (!$data) {
-			return [];
+			return [
+				'girls' => 0,
+				'boys' => 0
+			];
 		}
 
 		$girls = $boys = [];
