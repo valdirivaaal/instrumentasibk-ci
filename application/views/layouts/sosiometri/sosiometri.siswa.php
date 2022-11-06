@@ -20,7 +20,7 @@
 				<?php
 				}
 				?>
-				<form action="<?php echo base_url('sosiometrisiswa/angketSiswa'); ?>" class="form-horizontal" method="post">
+				<form action="<?php echo base_url('SosiometriSiswa/angketSiswa'); ?>" class="form-horizontal" method="post">
 					<input type="hidden" name="id_sosiometri" value="<?php echo $config['id']; ?>">
 					<div class="form-group">
 						<label for="kelas" class="col-lg-12 control-label">Kelas</label>
@@ -97,7 +97,7 @@
 
 			$.ajax({
 				type: 'GET',
-				url: "<?php echo base_url('sosiometrisiswa/getSiswa') ?>" + '/' + idKelas,
+				url: "<?php echo base_url('SosiometriSiswa/getSiswa') ?>" + '/' + idKelas,
 				cache: false,
 				success: function(resp) {
 					console.log(resp)
@@ -189,7 +189,7 @@
 					id_kelas: $('#kelas').val(),
 					id_siswa: siswaChosen
 				},
-				url: "<?php echo base_url('sosiometrisiswa/getSiswaNotIn'); ?>",
+				url: "<?php echo base_url('SosiometriSiswa/getSiswaNotIn'); ?>",
 				cache: false,
 				success: function(resp) {
 					// console.log('Data siswa', resp)
