@@ -67,7 +67,7 @@ $route['dcm/kode_save'] = 'dcm/kode_save';
 $route['translate_uri_dashes'] = FALSE;
 
 // Sosiometri routes
-$route['sosiometri/siswa/(:any)'] = 'sosiometrisiswa/sosiometriSiswaPage/$1';
+$route['sosiometri/siswa/(:any)'] = 'SosiometriSiswa/sosiometriSiswaPage/$1';
 
 $route['admin'] = 'admin/dashboard';
 
