@@ -8,6 +8,7 @@ class Sosiometri extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('Main_model');
+		$this->load->model('GetModel');
 
 		if (!$this->session->userdata('logged_in')) {
 			redirect('auth/login');
@@ -55,12 +56,28 @@ class Sosiometri extends CI_Controller
 			]
 		);
 
+		$get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
+		$day_remaining = 0;
+		// printA($get_ticket);
+
+		if ($get_ticket) {
+			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+			$content = 'layouts/sosiometri/index.php';
+		} else {
+			$content = 'key';
+		}
+
+		if ($day_remaining <= 0) {
+			$content = 'key';
+		}
+
 		$data = [
 			'get_kelas' => $kelas,
 			'get_konselor' => $konselor,
 			'get_profil' => $profil,
 			'codeSettled' => $codeSettled,
-			'content' => 'layouts/sosiometri/index.php'
+			// 'content' => 'layouts/sosiometri/index.php'
+			'content' => $content
 		];
 
 		$this->load->view('main.php', $data, false);
