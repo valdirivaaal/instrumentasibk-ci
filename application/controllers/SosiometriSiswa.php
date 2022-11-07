@@ -59,19 +59,59 @@ class SosiometriSiswa extends CI_Controller
 
 	public function getSiswa($id)
 	{
-		$siswa = $this->Main_model->innerJoin(
-			"kelas_siswa",
-			"kelas.kelas as nama_kelas, kelas_siswa.*",
+		$alreadySubmit = $this->Main_model->join(
+			'sosiometri_respon',
+			'sosiometri_respon.*',
 			[
 				[
-					"table" => "kelas",
-					"parameter" => "kelas_siswa.id_kelas = kelas.id"
+					'table' => 'kelas_siswa',
+					'parameter' => 'kelas_siswa.id = sosiometri_respon.id_siswa'
 				]
 			],
 			[
-				"kelas_siswa.id_kelas" => $id
+				'kelas_siswa.id_kelas' => $id
 			]
 		);
+
+		if ($alreadySubmit) {
+			$exceptionStudents = [];
+
+			foreach ($alreadySubmit as $row) {
+				$exceptionStudents[] = $row['id_siswa'];
+			}
+
+			$siswa = $this->Main_model->innerJoin2(
+				"kelas_siswa",
+				"kelas.kelas as nama_kelas, kelas_siswa.*",
+				[
+					[
+						"table" => "kelas",
+						"parameter" => "kelas_siswa.id_kelas = kelas.id"
+					]
+				],
+				[
+					"kelas_siswa.id_kelas" => $id
+				],
+				[
+					'field' => 'kelas_siswa.id',
+					'rows' => $exceptionStudents
+				]
+			);
+		} else {
+			$siswa = $this->Main_model->innerJoin(
+				"kelas_siswa",
+				"kelas.kelas as nama_kelas, kelas_siswa.*",
+				[
+					[
+						"table" => "kelas",
+						"parameter" => "kelas_siswa.id_kelas = kelas.id"
+					]
+				],
+				[
+					"kelas_siswa.id_kelas" => $id
+				]
+			);
+		}
 
 		return $this->output
 			->set_content_type('application/json')
