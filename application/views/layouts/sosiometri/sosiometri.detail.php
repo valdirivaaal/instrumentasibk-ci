@@ -51,7 +51,7 @@
 				</div>
 			</div>
 			<div class="tab-pane fade" id="nav-tabulasi-arah" role="tabpanel" aria-labelledby="nav-tabulasi-arah-tab">
-				<div class="card">
+				<div class="card scrollable">
 					<div class="card-body">
 						<h4><?php echo $data['kelas_detail']['kelas'] ?? ''; ?></h4>
 						<div class="row">
@@ -154,7 +154,7 @@
 			<div class="tab-pane fade" id="nav-sociogram" role="tabpanel" aria-labelledby="nav-sociogram-tab">
 				<div class="card">
 					<div class="card-body">
-						<div id="sociogram"></div>
+						<div id="sociogram" style=""></div>
 					</div>
 				</div>
 			</div>
@@ -169,7 +169,16 @@
 		Highcharts.seriesType('sociogram', 'line', {
 			dataLabels: {
 				enabled: true,
-				format: '{point.name}'
+				allowOverlap: true,
+				align: "center",
+				// y: 2,
+				x: 5,
+				// rotation: -45,
+				style: {
+					fontSize: "12px"
+				},
+				visibility: 'inherit',
+				format: '{point.name}',
 			}
 		}, {
 			// Use the drawGraph function to draw relational paths between the nodes
@@ -249,6 +258,7 @@
 
 	function getSociogramSeries() {
 		let idKelas = "<?php echo $data['kelas_detail']['id'] ?>";
+		let title = "<?php echo $data['kelas_detail']['kelas'] ?? ''; ?>"
 		$.ajax({
 			type: 'GET',
 			url: "<?php echo base_url(); ?>/sosiometri/getSociogramData/" + idKelas,
@@ -261,10 +271,10 @@
 						res.data.forEach((item, index) => {
 							temp.push({
 								id: item.id,
-								name: item.nama,
+								name: item.nis,
 								connections: item.connections,
 								rejection: item.pilihan_negatif ? item.pilihan_negatif : false,
-								y: item.pilihan.length ? item.pilihan.length : 1,
+								y: item.pilihan.length ? (item.pilihan.length + 1) : 1,
 								color: item.jk == 'L' ? 'blue' : 'red'
 							})
 						})
@@ -294,16 +304,17 @@
 							}],
 
 							title: {
-								text: 'Highcharts Sociogram Study'
+								// text: 'Highcharts Sociogram Study'
+								text: title + ' Sociogram'
 							},
 
 							xAxis: {
-								visible: false
+								visible: false,
 							},
 
 							yAxis: {
 								labels: {
-									enabled: false
+									enabled: false,
 								},
 								reversed: true,
 								plotBands: [{
@@ -331,6 +342,9 @@
 							},
 
 							series: [{
+								marker: {
+									enabled: true
+								},
 								data: seriesChart,
 								// data: [{
 								// 		id: 'MarcusID',
@@ -421,7 +435,10 @@
 								// 	}
 								// ],
 								type: 'sociogram',
-								name: 'Positive relations'
+								name: 'Positive relations',
+								marker: {
+									// lineWidth: 3
+								}
 							}, {
 								color: '#000',
 								type: 'sociogram',
@@ -438,3 +455,9 @@
 
 	getSociogramSeries()
 </script>
+<style>
+	.scrollable {
+		overflow-y: hidden !important;
+		overflow-x: auto !important;
+	}
+</style>
