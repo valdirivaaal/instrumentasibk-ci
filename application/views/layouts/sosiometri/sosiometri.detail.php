@@ -274,7 +274,7 @@
 								name: item.nis,
 								connections: item.connections,
 								rejection: item.pilihan_negatif ? item.pilihan_negatif : false,
-								y: item.pilihan.length ? (item.pilihan.length + 1) : 1,
+								y: item.pilihan.length ? (item.pilihan.length + 1) : 0,
 								color: item.jk == 'L' ? 'blue' : 'red'
 							})
 						})
@@ -316,7 +316,7 @@
 								labels: {
 									enabled: false,
 								},
-								reversed: true,
+								// reversed: true,
 								plotBands: [{
 									from: 0,
 									to: Infinity,
