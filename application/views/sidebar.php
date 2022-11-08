@@ -51,7 +51,7 @@ if (!empty($get_user)) {
 				</a>
 			</li>
 			<li>
-				<a class="<?= (getController() == 'pesertadidik') ? 'active' : '' ?>" href="<?= base_url('pesertadidik') ?>">
+				<a class="<?= (getController() == 'PesertaDidik') ? 'active' : '' ?>" href="<?= base_url('PesertaDidik') ?>">
 					<i class="fa fa-graduation-cap"></i>
 					<span>Daftar Peserta Didik</span>
 				</a>
