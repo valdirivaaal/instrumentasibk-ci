@@ -16,7 +16,7 @@ class SosiometriSiswa extends CI_Controller
 		// Get config
 		$config = $this->Main_model->join(
 			'sosiometri',
-			'*, sosiometri_pertanyaan.pertanyaan as pertanyaan',
+			'sosiometri.*, sosiometri_pertanyaan.pertanyaan as pertanyaan',
 			[
 				[
 					'table' => 'sosiometri_pertanyaan',

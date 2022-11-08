@@ -49,8 +49,9 @@
 
 		#sociogram {
 			min-width: 300px !important;
-			max-width: 800px !important;
+			max-width: 1800px !important;
 			margin: 1em auto;
+			overflow-x: auto;
 		}
 	</style>
 

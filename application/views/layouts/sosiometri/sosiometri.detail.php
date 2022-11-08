@@ -154,7 +154,7 @@
 			<div class="tab-pane fade" id="nav-sociogram" role="tabpanel" aria-labelledby="nav-sociogram-tab">
 				<div class="card">
 					<div class="card-body">
-						<div id="sociogram" style=""></div>
+						<div id="sociogram"></div>
 					</div>
 				</div>
 			</div>
@@ -261,20 +261,23 @@
 		let title = "<?php echo $data['kelas_detail']['kelas'] ?? ''; ?>"
 		$.ajax({
 			type: 'GET',
-			url: "<?php echo base_url(); ?>/sosiometri/getSociogramData/" + idKelas,
+			url: "<?php echo base_url(); ?>sosiometri/getSociogramData/" + idKelas,
 			success: function(res) {
-				// console.log('Ajax res', res)
+				console.log('Ajax res', res)
 
 				if (res) {
 					if (res.success) {
 						let temp = []
 						res.data.forEach((item, index) => {
+							let y = res.occurrences[item.id] !== undefined ? res.occurrences[item.id] + 1 : 1
 							temp.push({
 								id: item.id,
-								name: item.nis,
+								name: item.id,
+								// name: item.nis,
 								connections: item.connections,
 								rejection: item.pilihan_negatif ? item.pilihan_negatif : false,
-								y: item.pilihan.length ? (item.pilihan.length + 1) : 0,
+								// y: item.pilihan.length ? (item.pilihan.length) : 0,
+								y: y,
 								color: item.jk == 'L' ? 'blue' : 'red'
 							})
 						})
@@ -286,12 +289,21 @@
 
 							chart: {
 								height: '100%',
-								polar: true
+								polar: true,
+								// width: 900,
 							},
 
 							legend: {
 								enabled: true
 							},
+
+							// navigation: {
+							// 	buttonOptions: {
+							// 		verticalAlign: 'left',
+							// 		y: -20,
+							// 		x: 100
+							// 	}
+							// },
 
 							defs: [{
 								id: 'arrow-start',
@@ -316,7 +328,7 @@
 								labels: {
 									enabled: false,
 								},
-								// reversed: true,
+								reversed: true,
 								plotBands: [{
 									from: 0,
 									to: Infinity,
