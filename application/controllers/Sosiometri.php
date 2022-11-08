@@ -209,38 +209,49 @@ class Sosiometri extends CI_Controller
 				'success' => false,
 				'message' => 'ID Kelas not found'
 			]);
-		}
+		} else {
+			$data = $this->getStudentByClassWithResponse($idKelas);
 
-		$data = $this->getStudentByClassWithResponse($idKelas);
-
-		if (!$data) {
-			$return = json_encode([
-				'success' => false,
-				'message' => 'Data not found'
-			]);
-		}
-
-		foreach ($data as $index => $row) {
-			if ($row['pilihan']) {
-				if ($row['pilihan_negatif']) {
-					$connections = $row['pilihan'];
-					array_push($connections, $row['pilihan_negatif']);
-
-					$row['connections'] = $connections;
-				} else {
-					$row['connections'] = $row['pilihan'];
-				}
+			if (!$data) {
+				$return = json_encode([
+					'success' => false,
+					'message' => 'Data not found'
+				]);
 			} else {
-				$row['connections'] = [];
+				$studentSelected = [];
+
+				foreach ($data as $index => $row) {
+					if ($row['pilihan']) {
+						if ($row['pilihan_negatif']) {
+							$connections = $row['pilihan'];
+							array_push($connections, $row['pilihan_negatif']);
+
+							$row['connections'] = $connections;
+						} else {
+							$row['connections'] = $row['pilihan'];
+						}
+
+						foreach ($row['connections'] as $id) {
+							if (isset($studentSelected[$id])) {
+								$studentSelected[$id] += 1;
+							} else {
+								$studentSelected[$id] = 1;
+							}
+						}
+					} else {
+						$row['connections'] = [];
+					}
+
+					$data[$index] = $row;
+				}
+
+				$return = json_encode([
+					'success' => true,
+					'occurrences' => $studentSelected,
+					'data' => $data,
+				]);
 			}
-
-			$data[$index] = $row;
 		}
-
-		$return = json_encode([
-			'success' => true,
-			'data' => $data
-		]);
 
 		return $this->output
 			->set_content_type('application/json')
