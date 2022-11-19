@@ -218,8 +218,8 @@
 
 		// Post to backend
 		$.ajax({
-			type: 'POST',
-			url: "<?php echo base_url(); ?>sosiometri/report/" + idKelas,
+			type: "POST",
+			url: "<?php echo base_url('sosiometri/report'); ?>" + "/" + idKelas,
 			data: {
 				url: options.url,
 				filename: options.filename || 'chart',
@@ -227,6 +227,7 @@
 				type: options.type,
 				svg: Highcharts.getSVG(charts)
 			},
+			cache: false,
 			xhrFields: {
 				responseType: 'blob'
 			},
@@ -240,8 +241,8 @@
 				link.download = "<Laporan Sosiometri - " + kelas + ">";
 				link.click();
 			},
-			error: (error) => {
-				console.log(error)
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error(textStatus)
 			}
 		})
 	};
