@@ -242,7 +242,7 @@
 				link.click();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				console.error(textStatus)
+				console.error('Request failed', jqXHR, textStatus, errorThrown)
 			}
 		})
 	};
