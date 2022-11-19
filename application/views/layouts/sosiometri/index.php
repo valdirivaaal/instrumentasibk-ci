@@ -41,7 +41,7 @@
 				<?php
 				}
 				?>
-				<a href="<?= base_url('kelas/tambah') ?>" class="btn btn-primary float-right"><i class="fa fa-file-pdf-o" area-hidden="true"></i> Laporan <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></a>
+				<!-- <a href="<?= base_url('kelas/tambah') ?>" class="btn btn-primary float-right"><i class="fa fa-file-pdf-o" area-hidden="true"></i> Laporan <?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></a> -->
 				<div class="adv-table">
 					<table class="display table table-bordered table-striped dynamic-table">
 						<thead>
