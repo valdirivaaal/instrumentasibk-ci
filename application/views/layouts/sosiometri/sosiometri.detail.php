@@ -3,6 +3,8 @@
 		<div class="panel-body bio-graph-info">
 			<h1 class="font-weight-bold">Detail Sosiometri</h1>
 		</div>
+		<!-- <a onclick='' id="download-report" target="_blank" href="<?php echo base_url('sosiometri/report/') . $data['kelas_detail']['id']; ?>" class="btn btn-sm float-right ml-2 btn-primary"><i class="fa fa-download"></i> Unduh Laporan</a> -->
+		<a id="download-report" class="btn btn-primary btn-sm float-right ml-2"><i class="fa fa-download"></i> Unduh Laporan</a>
 		<nav>
 			<div class="nav nav-tabs" id="nav-tab" role="tablist">
 				<a class="nav-item nav-link active" id="nav-respon-tab" data-toggle="tab" href="#nav-respon" role="tab" aria-controls="nav-respon" aria-selected="true">Respon</a>
@@ -162,9 +164,88 @@
 	</div>
 </div>
 <script>
-	// $(document).ready(function() {
+	Highcharts.getSVG = function(charts) {
+		let top = 0;
+		let width = 0;
 
-	// })
+		const groups = charts.map(chart => {
+			let svg = chart.getSVG();
+			// Get width/height of SVG for export
+			const svgWidth = +svg.match(
+				/^<svg[^>]*width\s*=\s*\"?(\d+)\"?[^>]*>/
+			)[1];
+			const svgHeight = +svg.match(
+				/^<svg[^>]*height\s*=\s*\"?(\d+)\"?[^>]*>/
+			)[1];
+
+			svg = svg
+				.replace(
+					'<svg',
+					'<g transform="translate(0,' + top + ')" '
+				)
+				.replace('</svg>', '</g>');
+
+			top += svgHeight;
+			width = Math.max(width, svgWidth);
+
+			return svg;
+		}).join('');
+
+		return `<svg height="${top}" width="${width}" version="1.1"
+        xmlns="http://www.w3.org/2000/svg">
+            ${groups}
+        </svg>`;
+	};
+
+	/**
+	 * Create a global exportCharts method that takes an array of charts as an
+	 * argument, and exporting options as the second argument
+	 */
+	Highcharts.exportCharts = function(charts, options) {
+		let idKelas = "<?php echo $data['kelas_detail']['id'] ?>";
+		let kelas = "<?php echo $data['kelas_detail']['kelas'] ?? ''; ?>";
+
+		// Merge the options
+		options = Highcharts.merge(Highcharts.getOptions().exporting, options);
+
+		// Post to export server
+		// Highcharts.post(options.url, {
+		// 	filename: options.filename || 'chart',
+		// 	type: options.type,
+		// 	width: options.width,
+		// 	svg: Highcharts.getSVG(charts)
+		// });
+
+		// Post to backend
+		$.ajax({
+			type: 'POST',
+			url: "<?php echo base_url(); ?>sosiometri/report/" + idKelas,
+			data: {
+				url: options.url,
+				filename: options.filename || 'chart',
+				width: options.width,
+				type: options.type,
+				svg: Highcharts.getSVG(charts)
+			},
+			xhrFields: {
+				responseType: 'blob'
+			},
+			success: (res) => {
+				console.log('PDF', res)
+				var blob = new Blob([res], {
+					type: 'application/pdf'
+				});
+				var link = document.createElement('a');
+				link.href = window.URL.createObjectURL(blob);
+				link.download = "<Laporan Sosiometri - " + kelas + ">";
+				link.click();
+			},
+			error: (error) => {
+				console.log(error)
+			}
+		})
+	};
+
 	(function(H) {
 		Highcharts.seriesType('sociogram', 'line', {
 			dataLabels: {
@@ -188,7 +269,7 @@
 					relations = this.relations = this.relations || {};
 
 				this.points.forEach(function(point) {
-					console.log('Points', point)
+					// console.log('Points', point)
 					point.connections.forEach(function(connId) {
 
 						var key = point.id + '-' + connId,
@@ -285,7 +366,7 @@
 						seriesChart = temp;
 
 						console.log('Series', seriesChart)
-						Highcharts.chart('sociogram', {
+						var sociogram = Highcharts.chart('sociogram', {
 
 							chart: {
 								height: '100%',
@@ -458,6 +539,10 @@
 							}]
 
 						});
+
+						document.getElementById('download-report').addEventListener('click', () =>
+							Highcharts.exportCharts([sociogram])
+						);
 					}
 				}
 			}
@@ -471,5 +556,9 @@
 	.scrollable {
 		overflow-y: hidden !important;
 		overflow-x: auto !important;
+	}
+
+	a#download-report {
+		color: #FFFFFF !important;
 	}
 </style>
