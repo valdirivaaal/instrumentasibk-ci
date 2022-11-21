@@ -4,7 +4,7 @@
 			<h1 class="font-weight-bold">Detail Sosiometri</h1>
 		</div>
 		<!-- <a onclick='' id="download-report" target="_blank" href="<?php echo base_url('sosiometri/report/') . $data['kelas_detail']['id']; ?>" class="btn btn-sm float-right ml-2 btn-primary"><i class="fa fa-download"></i> Unduh Laporan</a> -->
-		<a id="download-report" class="btn btn-primary btn-sm float-right ml-2"><i class="fa fa-download"></i> Unduh Laporan</a>
+		<a id="download-report" class="btn btn-primary btn-sm float-right ml-2 <?php echo $data['details'] ? '' : 'disable-download'; ?>"><i class="fa fa-download"></i> Unduh Laporan</a>
 		<nav>
 			<div class="nav nav-tabs" id="nav-tab" role="tablist">
 				<a class="nav-item nav-link active" id="nav-respon-tab" data-toggle="tab" href="#nav-respon" role="tab" aria-controls="nav-respon" aria-selected="true">Respon</a>
@@ -561,5 +561,9 @@
 
 	a#download-report {
 		color: #FFFFFF !important;
+	}
+
+	.disable-download {
+		pointer-events: none !important;
 	}
 </style>
