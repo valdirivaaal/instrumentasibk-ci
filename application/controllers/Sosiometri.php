@@ -60,7 +60,7 @@ class Sosiometri extends CI_Controller
 		// $get_ticket = $this->GetModel->getLastTicket($this->session->userdata('id'));
 		$get_ticket = $this->GetModel->getLastTicketSociometri($this->session->userdata('id'));
 		$day_remaining = 0;
-		printA($get_ticket);
+		// printA($get_ticket);
 
 		if ($get_ticket) {
 			$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
