@@ -37,6 +37,7 @@
 							<option value="1">Guru BK</option>
 							<option value="2">Konselor</option>
 							<option value="3">DCM</option>
+							<option value="4">Sosiometri</option>
 						</select>
 					</div>
 					<div class="mb-3">

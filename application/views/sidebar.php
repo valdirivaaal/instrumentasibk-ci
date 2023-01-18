@@ -1,5 +1,6 @@
 <?php
-$get_user = $this->db->query("SELECT *,ticket.date_created as date_created,user_info.status as `status` FROM `ticket` JOIN user_info ON ticket.user_id=user_info.user_id JOIN event_key ON ticket.event_key=event_key.id WHERE ticket.user_id = " . $this->session->userdata('id') . " GROUP BY ticket.id DESC LIMIT 1")->result_array();
+$get_user = $this->db->query("SELECT *,ticket.date_created as date_created,user_info.status as `status` FROM `ticket` JOIN user_info ON ticket.user_id=user_info.user_id JOIN event_key ON ticket.event_key=event_key.id WHERE ticket.user_id = " . $this->session->userdata('id') . "")->result_array();
+// $get_user = $this->db->query("SELECT *,ticket.date_created as date_created,user_info.status as `status` FROM `ticket` JOIN user_info ON ticket.user_id=user_info.user_id JOIN event_key ON ticket.event_key=event_key.id WHERE ticket.user_id = " . $this->session->userdata('id') . " GROUP BY ticket.id DESC LIMIT 1")->result_array();
 if (!empty($get_user)) {
 	$day_remaining = ceil((strtotime($get_user[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
 } else {
