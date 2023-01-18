@@ -199,7 +199,6 @@ class Admin extends CI_Controller
 		$data['content'] = 'admin/key_available';
 		$data['status'] = 'Tersedia';
 		$data['state'] = 'available';
-
 		$this->load->view('admin/main.php', $data, FALSE);
 	}
 
@@ -208,6 +207,7 @@ class Admin extends CI_Controller
 		$data['get_key_guru'] = $this->Main_model->get_where('event_key', array('status' => 'Active', 'tipe' => 1));
 		$data['get_key_konselor'] = $this->Main_model->get_where('event_key', array('status' => 'Active', 'tipe' => 2));
 		$data['get_key_dcm'] = $this->Main_model->get_where('event_key', array('status' => 'Active', 'tipe' => 3));
+		$data['get_key_sociometri'] = $this->Main_model->get_where('event_key', ['status' => 'Inactive', 'tipe' => 4]);
 		$data['content'] = 'admin/key_available';
 		$data['status'] = 'Terpakai';
 		$data['state'] = 'used';

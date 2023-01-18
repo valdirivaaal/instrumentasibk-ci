@@ -287,39 +287,41 @@
 							<?php
 							$i = 1;
 
-							foreach ($get_key_sociometri as $key => $value) {
-								$get_ticket = $this->db->query("SELECT * FROM `event_key` LEFT JOIN ticket ON event_key.id = ticket.event_key JOIN user_info ON ticket.user_id = user_info.user_id WHERE ticket.event_key = " . $value['id'] . "")->result_array();
+							if ($get_key_sociometri) {
+								foreach ($get_key_sociometri as $key => $value) {
+									$get_ticket = $this->db->query("SELECT * FROM `event_key` LEFT JOIN ticket ON event_key.id = ticket.event_key JOIN user_info ON ticket.user_id = user_info.user_id WHERE ticket.event_key = " . $value['id'] . "")->result_array();
 
-								if (!empty($get_ticket)) {
-									$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
-								} else {
-									$day_remaining = 0;
-								}
+									if (!empty($get_ticket)) {
+										$day_remaining = ceil((strtotime($get_ticket[0]['tgl_kadaluarsa']) - time()) / (60 * 60 * 24));
+									} else {
+										$day_remaining = 0;
+									}
 							?>
-								<tr class="gradeX">
-									<td><?= $i++ ?></td>
-									<td><?= $value['event_key'] ?></td>
-									<?php if (!empty($get_ticket[0]['tgl_kadaluarsa'])) { ?>
-										<td><?= $get_ticket[0]['nama_lengkap'] ?></td>
-									<?php } else { ?>
-										<td>-</td>
-									<?php } ?>
-									<?php if (!empty($get_ticket[0]['tgl_kadaluarsa'])) { ?>
-										<td><?= $get_ticket[0]['tgl_kadaluarsa'] ?></td>
-									<?php } else { ?>
-										<td><?= $value['masa_berlaku'] ?> Hari</td>
-									<?php } ?>
-									<?php if ($state == 'available') { ?>
-										<td>
-											<a href="<?= base_url('admin/key/' . $value['event_key']) ?>" class="btn btn-info">Edit</a>
-											<button onclick="deletealert(this)" data-id="<?= $value['id'] ?>" class="btn btn-danger delete-alert<?= $value['id'] ?>">Hapus</button>
-										</td>
-									<?php } else { ?>
-										<td><?= $day_remaining ?> Hari</td>
-										<td><?= empty($get_ticket[0]) || $get_ticket[0]['tgl_kadaluarsa'] <= date('Y-m-d') ? 'Expired' : 'Active' ?></td>
-									<?php } ?>
-								</tr>
+									<tr class="gradeX">
+										<td><?= $i++ ?></td>
+										<td><?= $value['event_key'] ?></td>
+										<?php if (!empty($get_ticket[0]['tgl_kadaluarsa'])) { ?>
+											<td><?= $get_ticket[0]['nama_lengkap'] ?></td>
+										<?php } else { ?>
+											<td>-</td>
+										<?php } ?>
+										<?php if (!empty($get_ticket[0]['tgl_kadaluarsa'])) { ?>
+											<td><?= $get_ticket[0]['tgl_kadaluarsa'] ?></td>
+										<?php } else { ?>
+											<td><?= $value['masa_berlaku'] ?> Hari</td>
+										<?php } ?>
+										<?php if ($state == 'available') { ?>
+											<td>
+												<a href="<?= base_url('admin/key/' . $value['event_key']) ?>" class="btn btn-info">Edit</a>
+												<button onclick="deletealert(this)" data-id="<?= $value['id'] ?>" class="btn btn-danger delete-alert<?= $value['id'] ?>">Hapus</button>
+											</td>
+										<?php } else { ?>
+											<td><?= $day_remaining ?> Hari</td>
+											<td><?= empty($get_ticket[0]) || $get_ticket[0]['tgl_kadaluarsa'] <= date('Y-m-d') ? 'Expired' : 'Active' ?></td>
+										<?php } ?>
+									</tr>
 							<?php
+								}
 							}
 							?>
 						</tbody>
