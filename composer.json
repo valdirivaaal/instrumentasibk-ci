@@ -1,5 +1,8 @@
 {
     "require": {
         "vlucas/phpdotenv": "^4.2"
-    }
+    },
+	"config": {
+		"platform-check": false
+	}
 }
