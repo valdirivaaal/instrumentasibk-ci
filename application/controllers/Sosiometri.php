@@ -241,6 +241,8 @@ class Sosiometri extends CI_Controller
 		/* close curl */
 		curl_close($curl);
 
+		printA($result);
+
 		$surat = $this->getSurat();
 		$kelompok = $this->getKelompok($idKelas);
 		// $kelas = $this->getKelas($kelompok['kelas']);

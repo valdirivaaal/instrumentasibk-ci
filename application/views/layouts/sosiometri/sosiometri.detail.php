@@ -219,7 +219,7 @@
 		// Post to backend
 		$.ajax({
 			type: "POST",
-			url: "<?php echo base_url('Sosiometri/Report'); ?>" + "/" + idKelas,
+			url: "<?php echo base_url('Sosiometri/report'); ?>" + "/" + idKelas,
 			data: {
 				url: options.url,
 				filename: options.filename || 'chart',
