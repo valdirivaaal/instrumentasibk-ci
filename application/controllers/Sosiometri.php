@@ -702,16 +702,16 @@ class Sosiometri extends CI_Controller
 		$pdf->SetTextColor(255);
 		$pdf->SetDrawColor(52, 58, 64);
 		$pdf->SetLineWidth(.3);
-		$pdf->SetFont('', 'B');
+		$pdf->SetFont('Arial', 'B');
 		// Header
-		$w = array(20, 50, 70);
+		$w = array(15, 80, 50);
 		for ($i = 0; $i < count($header); $i++)
 			$pdf->Cell($w[$i], 7, $header[$i], 1, 0, 'C', true);
 		$pdf->Ln();
 		// Color and font restoration
 		$pdf->SetFillColor(224, 235, 255);
 		$pdf->SetTextColor(0);
-		$pdf->SetFont('');
+		$pdf->SetFont('Arial', '', '8');
 		// Data
 		$fill = false;
 		foreach ($data as $row) {
@@ -721,9 +721,11 @@ class Sosiometri extends CI_Controller
 			// $pdf->Cell($w[3], 6, number_format($row[3]), 'LR', 0, 'R', $fill);
 			// $pdf->Ln();
 			// $fill = !$fill;
+			$nilai = $row['score_pemilih'] / $studentTotal == 0 ? 0 : number_format((float)($row['score_pemilih'] / $studentTotal), 2, ',', '');
+
 			$pdf->Cell($w[0], 6, $row['nis'], 'LR', 0, 'L', $fill);
 			$pdf->Cell($w[1], 6, $row['nama'], 'LR', 0, 'L', $fill);
-			$pdf->Cell($w[2], 6, $row['score_pemilih'] . ' / ' . $studentTotal . ' = ' . ($row['score_pemilih'] / $studentTotal), 'LR', 0, 'R', $fill);
+			$pdf->Cell($w[2], 6, $row['score_pemilih'] . ' / ' . $studentTotal . ' = ' . $nilai, 'LR', 0, 'R', $fill);
 			$pdf->Ln();
 			$fill = !$fill;
 		}
