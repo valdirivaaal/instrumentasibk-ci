@@ -206,6 +206,8 @@ class Sosiometri extends CI_Controller
 
 	public function report($idKelas)
 	{
+		printA($this->input->post());
+
 		$this->load->library('fpdf_diag');
 
 		// Data resources
