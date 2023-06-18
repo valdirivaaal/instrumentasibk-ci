@@ -18,21 +18,49 @@ class Sosiometri extends CI_Controller
 
 	public function index()
 	{
+		// $kelas = $this->Main_model->join(
+		// 	'kelas',
+		// 	'*,kelas.id as id',
+		// 	array(
+		// 		array(
+		// 			'table' => 'user_konselor',
+		// 			'parameter' => 'user_konselor.id=kelas.konselor_id'
+		// 		)
+		// 	),
+		// 	array(
+		// 		'kelas.user_id' => $this->session->userdata('id')
+		// 	),
+		// 	'kelas',
+		// 	'asc'
+		// );
+
 		$kelas = $this->Main_model->join(
+			'kelas as a',
+			'*,d.nama_lengkap,count(c.id) as jumlah_respon',
+			[
+				[
+					'table' => 'kelas_siswa as b',
+					'parameter' => 'b.id_kelas=a.id'
+				],
+				[
+					'table' => 'sosiometri_respon as c',
+					'parameter' => 'c.id_siswa=b.id'
+				],
+				[
+					'table' => 'user_konselor as d',
+					'parameter' => 'd.id=a.konselor_id'
+				]
+			],
+			[
+				'a.user_id' => $this->session->userdata('id')
+			],
 			'kelas',
-			'*,kelas.id as id',
-			array(
-				array(
-					'table' => 'user_konselor',
-					'parameter' => 'user_konselor.id=kelas.konselor_id'
-				)
-			),
-			array(
-				'kelas.user_id' => $this->session->userdata('id')
-			),
-			'kelas',
-			'asc'
+			'asc',
+			'',
+			'a.id'
 		);
+
+		// printA($kelas);
 
 		$konselor = $this->Main_model->get_where(
 			'user_konselor',
@@ -85,23 +113,94 @@ class Sosiometri extends CI_Controller
 		$this->load->view('main.php', $data, false);
 	}
 
+	public function deleteSociometriResponses($idKelas = '')
+	{
+		$this->GetModel->deleteSociometriResponses($idKelas);
+		// redirect('sosiometri');
+	}
+
+	public function deleteSingleSociometriResponse($idRespon = '')
+	{
+		$this->Main_model->delete_data('sosiometri_respon', ['id' => $idRespon]);
+	}
+
 	public function setcode()
 	{
+		$config = $this->Main_model->get_where('sosiometri_config', ['id' => 1]);
 		$pertanyaan = $this->Main_model->get('sosiometri_pertanyaan');
 		$codeSettled = $this->Main_model->get_where('sosiometri', ['user_id' => $this->session->userdata('id')]);
 
+		if ($codeSettled) {
+			$responPertanyaan = $this->Main_model->get_where('sosiometri_respon_pertanyaan', ['id_sosiometri' => $codeSettled[0]['id']]);
+		} else {
+			$responPertanyaan = [];
+		}
+
 		$data = [
+			'config' => $config,
 			'pertanyaan' => $pertanyaan,
 			'codeSettled' => $codeSettled ? $codeSettled : [],
+			'responPertanyaan' => $responPertanyaan,
 			'content' => 'layouts/sosiometri/sosiometri.setcode.php'
 		];
 
 		$this->load->view('main.php', $data, false);
 	}
 
+	public function getQuestions()
+	{
+		$req = $this->input->get();
+
+		$questions = $this->Main_model->get('sosiometri_pertanyaan');
+
+		if (!empty($req['id_sosiometri'])) {
+			$sosiometri = $this->Main_model->get_where('sosiometri', ['id' => $req['id_sosiometri']]);
+
+			if ($sosiometri) {
+				$sosiometri[0]['id_pertanyaan'] = unserialize($sosiometri[0]['id_pertanyaan']);
+			}
+		}
+
+
+		return $this->output
+			->set_content_type('application/json')
+			->set_status_header(200)
+			->set_output(json_encode(array(
+				'success' => true,
+				'data' => $questions,
+				'sosiometri' => isset($sosiometri) ? $sosiometri : []
+			)));
+	}
+
+	public function getQuestionNotIn()
+	{
+		$req = $this->input->get();
+
+		$questions = $this->Main_model->get_where_not("sosiometri_pertanyaan", $req['id'], "id");
+
+		if (!empty($req['id_sosiometri'])) {
+			$sosiometri = $this->Main_model->get_where('sosiometri', ['id' => $req['id_sosiometri']]);
+
+			if ($sosiometri) {
+				$sosiometri[0]['id_pertanyaan'] = unserialize($sosiometri[0]['id_pertanyaan']);
+			}
+		}
+
+		return $this->output
+			->set_content_type('application/json')
+			->set_status_header(200)
+			->set_output(json_encode(array(
+				'success' => true,
+				'data' => $questions,
+				'sosiometri' => isset($sosiometri) ? $sosiometri : []
+			)));
+	}
+
 	public function codeSave()
 	{
 		$request = $this->input->post();
+
+		// printA($request);
 
 		$codeSettled = $this->Main_model->get_where('sosiometri', ['user_id' => $this->session->userdata('id')]);
 
@@ -123,7 +222,7 @@ class Sosiometri extends CI_Controller
 
 			// Reset data
 			$data = [
-				'id_pertanyaan' => $request['id_pertanyaan'],
+				'id_pertanyaan' => serialize($request['id_pertanyaan']),
 				'judul' => $request['judul'],
 				'jumlah_pilihan' => $request['jumlah_pilihan'],
 				'bobot_penilaian' => serialize($request['bobot_penilaian']),
@@ -132,13 +231,16 @@ class Sosiometri extends CI_Controller
 			];
 
 			// Save config
-			$this->Main_model->insert_data('sosiometri', $data);
+			$idSosiometri = $this->Main_model->insert_data('sosiometri', $data);
+
+			// Insert pertanyaan
+			// $this->insertResponPertanyaan($idSosiometri, $request['id_pertanyaan']);
 			$this->session->set_flashdata('success', 'code');
 		} else {
 
 			// Reset data
 			$data = [
-				'id_pertanyaan' => $request['id_pertanyaan'],
+				'id_pertanyaan' => serialize($request['id_pertanyaan']),
 				'judul' => $request['judul'],
 				'jumlah_pilihan' => $request['jumlah_pilihan'],
 				'bobot_penilaian' => serialize($request['bobot_penilaian']),
@@ -149,10 +251,33 @@ class Sosiometri extends CI_Controller
 
 			// Update existing record
 			$this->Main_model->update_data('sosiometri', $data, ['id' => $request['id']]);
+
+			// Insert pertanyaan
+			// $this->insertResponPertanyaan($request['id'], $request['id_pertanyaan']);
 			$this->session->set_flashdata('success', 'code');
 		}
 
 		redirect('sosiometri');
+	}
+
+	public function insertResponPertanyaan($idSosiometri, $pertanyaans)
+	{
+		if (!$pertanyaans) {
+			return false;
+		}
+
+		$data = [];
+		foreach ($pertanyaans as $id) {
+			$data[] = [
+				"id_sosiometri" => $idSosiometri,
+				"id_pertanyaan" => $id
+			];
+		}
+
+		// Delete all respon pertanyaan if exist
+		$this->Main_model->delete_data('sosiometri_respon_pertanyaan', ['id_sosiometri' => $idSosiometri]);
+		// Store new records
+		$this->Main_model->insert_data_batch('sosiometri_respon_pertanyaan', $data);
 	}
 
 	public function detail($idKelas)
@@ -160,7 +285,7 @@ class Sosiometri extends CI_Controller
 		// Get sosiometri respon by class
 		$sosiometriResponse = $this->Main_model->join(
 			'sosiometri_respon',
-			'*',
+			'sosiometri_respon.*, sosiometri_respon.id as id_respon, kelas_siswa.*, kelas_siswa.id as id_siswa',
 			[
 				[
 					'table' => 'kelas_siswa',
@@ -946,7 +1071,8 @@ class Sosiometri extends CI_Controller
 
 		$data = $this->Main_model->join(
 			'kelas_siswa',
-			'kelas_siswa.*, 
+			'kelas_siswa.*,
+			sosiometri_respon.id as id_respon, 
 			sosiometri_respon.pilihan as pilihan, 
 			sosiometri_respon.pilihan_negatif as pilihan_negatif,
 			sosiometri.bobot_penilaian as bobot_penilaian',
@@ -978,8 +1104,6 @@ class Sosiometri extends CI_Controller
 		}
 
 		$data = $this->calculateBobotPenilaian($data);
-
-		// printA($data);
 
 		return $data ? $data : [];
 	}

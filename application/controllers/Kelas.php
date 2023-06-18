@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Kelas extends CI_Controller {
+class Kelas extends CI_Controller
+{
 
 	private $filename = 'import_data';
 
@@ -9,7 +10,7 @@ class Kelas extends CI_Controller {
 	{
 		parent::__construct();
 
-		require_once APPPATH.'third_party/PHPExcel-1.8/Classes/PHPExcel.php';
+		require_once APPPATH . 'third_party/PHPExcel-1.8/Classes/PHPExcel.php';
 
 		$this->load->model('Main_model');
 		$this->load->model('SiswaModel');
@@ -26,10 +27,12 @@ class Kelas extends CI_Controller {
 			'*,kelas.id as id',
 			array(
 				array(
-					'table'=>'user_konselor',
-					'parameter'=>'user_konselor.id=kelas.konselor_id')
-				),
-				array('kelas.user_id'=>$this->session->userdata('id')
+					'table' => 'user_konselor',
+					'parameter' => 'user_konselor.id=kelas.konselor_id'
+				)
+			),
+			array(
+				'kelas.user_id' => $this->session->userdata('id')
 			),
 			'kelas',
 			'asc'
@@ -50,47 +53,50 @@ class Kelas extends CI_Controller {
 				'user_id' => $this->session->userdata('id')
 			)
 		);
-		
+
 		$data['content'] = 'kelas.php';
 
 		$this->load->view('main.php', $data, FALSE);
 	}
 
-	public function tambah($id="")
+	public function tambah($id = "")
 	{
-		$data['get_kelas'] = $this->Main_model->get_where('kelas',array('id'=>$id));
-		$data['get_konselor'] = $this->Main_model->get_where('user_konselor',array('user_id'=>$this->session->userdata('id')),'nama_lengkap','asc');
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
+		$data['get_konselor'] = $this->Main_model->get_where('user_konselor', array('user_id' => $this->session->userdata('id')), 'nama_lengkap', 'asc');
 		$data['content'] = 'kelas_edit.php';
 
 		$this->load->view('main.php', $data, FALSE);
 	}
 
-	public function save(){
+	public function save()
+	{
 		$post = $this->input->post();
 		if ($post['id']) {
 			$post['date_modified'] = date('Y-m-d H:i:s');
-			$this->Main_model->update_data('kelas',$post,array('id'=>$post['id']));
+			$this->Main_model->update_data('kelas', $post, array('id' => $post['id']));
 		} else {
 			$post['user_id'] = $this->session->userdata('id');
 			$post['date_created'] = date('Y-m-d H:i:s');
-			$this->Main_model->insert_data('kelas',$post);
+			$this->Main_model->insert_data('kelas', $post);
 		}
 
 
-		$this->session->set_flashdata('success','kelas');
+		$this->session->set_flashdata('success', 'kelas');
 		redirect('kelas');
 	}
 
-	public function sunting($id=""){
-		$data['get_kelas'] = $this->Main_model->get_where('kelas',array('id'=>$id));
-		$data['get_konselor'] = $this->Main_model->get_where('user_konselor',array('user_id'=>$this->session->userdata('id')),'nama_lengkap','asc');
+	public function sunting($id = "")
+	{
+		$data['get_kelas'] = $this->Main_model->get_where('kelas', array('id' => $id));
+		$data['get_konselor'] = $this->Main_model->get_where('user_konselor', array('user_id' => $this->session->userdata('id')), 'nama_lengkap', 'asc');
 		$data['content'] = 'kelas_edit.php';
 
 		$this->load->view('main.php', $data, FALSE);
 	}
 
-	public function hapus($id=""){
-		$this->Main_model->delete_data('kelas',array('id'=>$id));
+	public function hapus($id = "")
+	{
+		$this->Main_model->delete_data('kelas', array('id' => $id));
 		redirect('kelas');
 	}
 
@@ -132,18 +138,16 @@ class Kelas extends CI_Controller {
 	{
 		$data = [];
 
-		if (isset($_POST['preview']))
-		{
+		if (isset($_POST['preview'])) {
 			$upload = $this->SiswaModel->upload_file($this->filename);
 
-			if ($upload['result'] == 'success')
-			{
+			if ($upload['result'] == 'success') {
 				$excel = new PHPExcel_Reader_Excel2007();
 				$loadExcel = $excel->load('excel/' . $this->filename . '.xlsx');
 				$sheet = $loadExcel->getActiveSheet()->toArray(null, true, true, true);
 
 				$data['sheet'] = $sheet;
-			} else  {
+			} else {
 				$data['upload_error'] = $upload['error'];
 			}
 		}

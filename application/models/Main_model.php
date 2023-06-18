@@ -164,6 +164,14 @@ class Main_model extends CI_Model
 		return  $insert_id;
 	}
 
+	public function insert_data_batch($table = 'default', $data = '')
+	{
+		$table = $table == 'default' ? $this->table : $table;
+		$this->db->trans_start();
+		$this->db->insert_batch($table, $data);
+		return $this->db->trans_complete();
+	}
+
 	public function update_data($table = "default", $data = "", $params = "")
 	{
 		$table = $table == "default" ? $this->table : $table;

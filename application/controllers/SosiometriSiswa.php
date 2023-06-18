@@ -30,6 +30,16 @@ class SosiometriSiswa extends CI_Controller
 			'asc'
 		);
 
+		$config = $this->Main_model->get_where('sosiometri', ['url' => $code]);
+
+		if ($config) {
+			$questions = unserialize($config[0]['id_pertanyaan']);
+
+			$q = $this->Main_model->get_where_in('sosiometri_pertanyaan', 'id', $questions);
+
+			$config[0]['pertanyaan'] = $q;
+		}
+
 		// Get list kelas
 		$kelas = $this->Main_model->join(
 			'kelas',
@@ -156,7 +166,7 @@ class SosiometriSiswa extends CI_Controller
 	public function angketSiswa()
 	{
 		$req = $this->input->post();
-		// printA($req);
+		printA($req);
 
 		$isResponded = $this->Main_model->get_where(
 			'sosiometri_respon',

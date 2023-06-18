@@ -1,3 +1,6 @@
+<?php
+// printA($data['details']);
+?>
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel-body bio-graph-info">
@@ -27,6 +30,7 @@
 									<th class="text-center" scope="col">NAMA SISWA</th>
 									<th class="text-center" scope="col">JENIS KELAMIN</th>
 									<th class="text-center" scope="col">PILIHAN 1</th>
+									<th class="text-center" scope="col">ACTION</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -39,6 +43,9 @@
 											<td class="text-center"><?php echo $row['jk'] == 'P' ? 'Perempuan' : 'Laki - Laki'; ?></td>
 											<td class="text-center">
 												<?php echo $row['pilihan'][0]['nis']; ?>
+											</td>
+											<td class="text-center">
+												<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $row['id_respon'] ?>" data-id="<?= $row['id_respon'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus Respon</button>
 											</td>
 										</tr>
 									<?php } ?>
@@ -164,6 +171,41 @@
 	</div>
 </div>
 <script>
+	function deletealert(data) {
+		var id = data.getAttribute("data-id");
+		swal.fire({
+			title: 'Apakah kamu yakin?',
+			text: "Kamu tidak bisa mengembalikan data setelah terhapus!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.value) {
+				$.ajax({
+					type: "POST",
+					url: "<?= base_url() ?>sosiometri/deleteSingleSociometriResponse/" + id,
+					cache: false,
+					success: function(response) {
+						console.log('Delete response', response)
+						swal.fire({
+							title: 'Terhapus!',
+							text: 'Tunggu beberapa detik atau klik ok.',
+							type: 'success',
+							timer: 3000
+						}, function() {
+							window.location.reload();
+						});
+						setTimeout(function() {
+							window.location.reload();
+						}, 3000);
+					}
+				})
+			}
+		})
+	}
+
 	Highcharts.getSVG = function(charts) {
 		let top = 0;
 		let width = 0;

@@ -2,15 +2,19 @@
 $params = [
 	'judul' => '',
 	'id_pertanyaan' => '',
+	'jumlah_pertanyaan' => 0,
 	'jumlah_pilihan' => '',
 	'bobot_penilaian' => [],
 	'url' => '',
 ];
 
+// printA($config);
+
 if ($codeSettled) {
 	// Set variable
 	$params['judul'] = $codeSettled[0]['judul'];
-	$params['id_pertanyaan'] = $codeSettled[0]['id_pertanyaan'];
+	$params['id_pertanyaan'] = unserialize($codeSettled[0]['id_pertanyaan']);
+	$params['jumlah_pertanyaan'] = count($params['id_pertanyaan']);
 	$params['jumlah_pilihan'] = $codeSettled[0]['jumlah_pilihan'];
 	$params['bobot_penilaian'] = unserialize($codeSettled[0]['bobot_penilaian']);
 	$params['url'] = $codeSettled[0]['url'];
@@ -52,20 +56,29 @@ if ($codeSettled) {
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="" class="col-lg-12 control-label">Pertanyaan</label>
+						<label for="" class="col-lg-12 control-label">Jumlah Pertanyaan</label>
 						<div class="col-md-12">
-							<select name="id_pertanyaan" id="" class="form-control" required>
-								<option value="">--Pilih Pertanyaan--</option>
-								<?php
-								if ($pertanyaan) {
-									foreach ($pertanyaan as $row) {
-								?>
-										<option <?php echo $row['id'] == $params['id_pertanyaan'] ? 'selected' : ''; ?> value="<?php echo $row['id']; ?>"><?php echo $row['pertanyaan']; ?></option>
-								<?php
+							<?php
+							if ($config) {
+								echo '<select name="jumlah_pertanyaan" id="jumlah_pertanyaan" class="form-control" required>';
+								for ($i = 1; $i <= $config[0]['jumlah_pertanyaan']; $i++) {
+									if ($params['jumlah_pertanyaan'] != 0) {
+										$selected = $params['jumlah_pertanyaan'] == $i ? 'selected' : '';
+									} else {
+										$selected = $i == 1 ? 'selected' : '';
 									}
+
+									echo '<option ' . $selected . ' value="' . $i . '">' . $i . '</option>';
 								}
-								?>
-							</select>
+								echo '</select>';
+							}
+							?>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="" class="col-lg-12 control-label">Pertanyaan</label>
+						<div class="col-md-12" id="questionGroup">
+							<!-- <small class="w-100">Pertanyaan ke-1</small> -->
 						</div>
 					</div>
 					<div class="form-group">
@@ -114,6 +127,8 @@ if ($codeSettled) {
 </div>
 <script>
 	$(document).ready(function() {
+		let arrQuestion = [];
+		let questionChosen = [];
 		var bobot_penilaian = <?php echo $params['bobot_penilaian'] ? 'true' : 'false'; ?>;
 		console.log('Bobot', bobot_penilaian)
 
@@ -147,5 +162,121 @@ if ($codeSettled) {
 				')
 			}
 		})
+
+		$("#jumlah_pertanyaan").on('change', function() {
+			var nums = $(this).val();
+
+			setQuestion(nums)
+		})
+
+		function setQuestion(amount) {
+			$.ajax({
+				type: 'GET',
+				data: {
+					id_sosiometri: "<?php echo $codeSettled ? $codeSettled[0]['id'] : ''; ?>"
+				},
+				url: "<?php echo base_url('Sosiometri/getQuestions'); ?>",
+				cache: false,
+				success: function(r) {
+					console.log('Set Question response', r)
+					if (r.success) {
+						let el = '';
+						let counter = 0;
+						for (let i = 1; i <= amount; i++) {
+							el += '<select name="id_pertanyaan[]" id="pertanyaan' + counter + '" class="form-control mt-2" required><option value="">-- Pilih Pertanyaan --</option>';
+
+							let selected = '';
+							$.each(r.data, function(index, v) {
+
+								if (r.sosiometri.length > 0) {
+									selected = v.id == r.sosiometri[0].id_pertanyaan[counter] ? 'selected' : '';
+								} else {
+									selected = '';
+								}
+
+								el += '<option ' + selected + ' value=' + v.id + '>' + v.pertanyaan + '</option>'
+							})
+
+							el += '</select>';
+							counter++;
+						}
+
+						$("#questionGroup").html(el);
+
+						// Reset
+						doReset()
+
+						$('select[name="id_pertanyaan[]"]').each(function() {
+							arrQuestion.push($(this).attr('id'))
+						})
+
+						console.log('Questions ID', arrQuestion)
+
+						$.each(arrQuestion, function(i, v) {
+							selectOnChange(v)
+
+							return false;
+						})
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error(jqXHR, textStatus, errorThrown)
+				}
+			})
+		}
+
+		function selectOnChange(selector) {
+			$("#" + selector).on("change", function() {
+				let val = $(this).val()
+				let selectorChange = arrQuestion.indexOf(selector) + 1
+
+				if (questionChosen[selectorChange] !== undefined) {
+					questionChosen[selectorChange] = val
+				} else {
+					questionChosen.push(val)
+				}
+
+				console.log('Question chosen', questionChosen)
+
+				getQuestionNotIn(arrQuestion[selectorChange])
+				selectOnChange(arrQuestion[selectorChange])
+			})
+		}
+
+		function getQuestionNotIn(selector) {
+			$.ajax({
+				type: 'GET',
+				data: {
+					id: questionChosen,
+					id_sosiometri: "<?php echo $codeSettled ? $codeSettled[0]['id'] : ''; ?>"
+				},
+				url: "<?php echo base_url('Sosiometri/getQuestionNotIn'); ?>",
+				cache: false,
+				success: function(r) {
+
+					if (r.success) {
+						console.log('Current selector', selector)
+						console.log('Question not in response', r)
+						let opt = '<option value="">-- Pilih Pertanyaan --</option>'
+
+						$.each(r.data, function(i, v) {
+							opt += '<option value="' + v.id + '">' + v.pertanyaan + '</option>'
+						})
+
+						$("#" + selector).html(opt)
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error(jqXHR, textStatus, errorThrown)
+				}
+			})
+		}
+
+		function doReset() {
+			arrQuestion = [];
+			questionChosen = [];
+		}
+
+		$("#jumlah_pertanyaan").change();
 	})
 </script>
