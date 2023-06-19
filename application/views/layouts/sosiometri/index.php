@@ -48,9 +48,9 @@
 							<tr>
 								<th>No</th>
 								<th><?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></th>
-								<th>Jumlah Siswa</th>
+								<th width="300">Jumlah Responden / Jumlah Siswa</th>
 								<th><?= ($get_profil[0]['status'] == 'Guru BK') ? 'Guru BK' : 'Jenjang' ?></th>
-								<th>Action</th>
+								<th width="250" class="text-center">Action</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -61,10 +61,11 @@
 								<tr class="gradeX">
 									<td><?= $i++ ?></td>
 									<td><?= $value['kelas'] ?></td>
-									<td><?= $value['jumlah_siswa'] ?></td>
+									<td><?php echo $value['jumlah_respon'] . '/' . $value['jumlah_siswa'];  ?></td>
 									<td><?= ($get_profil[0]['status'] == 'Guru BK') ? $value['nama_lengkap'] : $value['jenjang'] ?></td>
 									<td>
-										<a href="<?php echo base_url('sosiometri/detail/' . $value['id']); ?>" class="btn btn-sm btn-info"><i class="fa fa-eye"></i> Buka</a>
+										<a href="<?php echo base_url('sosiometri/detail/' . $value['id_kelas']); ?>" class="btn btn-sm btn-info"><i class="fa fa-eye"></i> Buka</a>
+										<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $value['id_kelas'] ?>" data-id="<?= $value['id_kelas'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Reset Respon</button>
 										<!-- <a href="<?= base_url('kelas/sunting/' . $value['id']) ?>" class="btn btn-sm btn-primary"><i class="fa fa-pencil"></i> Ubah</a> -->
 										<!-- <button type="button" class="btn btn-sm btn-info ml-2 delete-alert<?= $value['id'] ?>" data-id="<?= $value['id'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus</button> -->
 									</td>
@@ -73,7 +74,7 @@
 							}
 							?>
 						</tbody>
-						<tfoot>
+						<!-- <tfoot>
 							<tr>
 								<th>No</th>
 								<th><?= (getField('user_info', 'status', array('user_id' => $this->session->userdata('id'))) == 'Guru BK') ? 'Kelas' : 'Kelompok' ?></th>
@@ -81,7 +82,7 @@
 								<th><?= ($get_profil[0]['status'] == 'Guru BK') ? 'Guru BK' : 'Jenjang' ?></th>
 								<th>Action</th>
 							</tr>
-						</tfoot>
+						</tfoot> -->
 					</table>
 				</div>
 			</div>
@@ -104,9 +105,10 @@
 			if (result.value) {
 				$.ajax({
 					type: "POST",
-					url: "<?= base_url() ?>kelas/hapus/" + id,
+					url: "<?= base_url() ?>sosiometri/deleteSociometriResponses/" + id,
 					cache: false,
 					success: function(response) {
+						console.log('Delete response', response)
 						swal.fire({
 							title: 'Terhapus!',
 							text: 'Tunggu beberapa detik atau klik ok.',

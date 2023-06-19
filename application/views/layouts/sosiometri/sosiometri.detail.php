@@ -27,11 +27,12 @@
 									<th class="text-center" scope="col">NAMA SISWA</th>
 									<th class="text-center" scope="col">JENIS KELAMIN</th>
 									<th class="text-center" scope="col">PILIHAN 1</th>
+									<th class="text-center" scope="col">ACTION</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php if ($data['details']) { ?>
-									<?php foreach ($data['details'] as $row) { ?>
+									<?php foreach ($data['details'] as $absen => $row) { ?>
 										<tr>
 											<td class="text-center"><?php echo $row['nis']; ?></td>
 											<td class="text-center"><?php echo $row['created_at']; ?></td>
@@ -39,6 +40,9 @@
 											<td class="text-center"><?php echo $row['jk'] == 'P' ? 'Perempuan' : 'Laki - Laki'; ?></td>
 											<td class="text-center">
 												<?php echo $row['pilihan'][0]['nis']; ?>
+											</td>
+											<td class="text-center">
+												<button type="button" class="btn btn-sm btn-danger ml-2 delete-alert<?= $row['id_respon'] ?>" data-id="<?= $row['id_respon'] ?>" onclick="deletealert(this)"><i class="fa fa-trash-o"></i> Hapus Respon</button>
 											</td>
 										</tr>
 									<?php } ?>
@@ -72,6 +76,7 @@
 							<table class="table">
 								<thead class="thead-dark">
 									<tr>
+										<th class="align-middle text-center" rowspan="2">NO</th>
 										<th class="align-middle text-center" rowspan="2">NIS</th>
 										<th class="align-middle text-center" rowspan="2">NAMA</th>
 										<th class="text-center" colspan="<?php echo $data['tabulasi']['dataTotal']; ?>">Pemilih/Penolak</th>
@@ -88,8 +93,9 @@
 								</thead>
 								<tbody>
 									<?php if ($data['tabulasi']['data']) { ?>
-										<?php foreach ($data['tabulasi']['data'] as $row) { ?>
+										<?php foreach ($data['tabulasi']['data'] as $absen => $row) { ?>
 											<tr>
+												<td class="text-center"><?php echo $absen + 1; ?></td>
 												<td class="text-center"><?php echo $row['nis']; ?></td>
 												<td><?php echo $row['nama']; ?></td>
 												<?php
@@ -132,6 +138,7 @@
 							<table class="table">
 								<thead class="thead-dark">
 									<tr>
+										<th>NO</th>
 										<th>NIS</th>
 										<th>NAMA</th>
 										<th>NILAI</th>
@@ -139,8 +146,9 @@
 								</thead>
 								<tbody>
 									<?php if ($data['tabulasi']['data']) { ?>
-										<?php foreach ($data['tabulasi']['data'] as $row) { ?>
+										<?php foreach ($data['tabulasi']['data'] as $absen => $row) { ?>
 											<tr>
+												<td><?php echo $absen + 1; ?></td>
 												<td><?php echo $row['nis']; ?></td>
 												<td><?php echo $row['nama']; ?></td>
 												<td><?php echo $row['score_pemilih'] . ' / ' . $data['tabulasi']['studentTotal'] . ' = ' . ($row['score_pemilih'] / $data['tabulasi']['studentTotal']); ?></td>
@@ -164,6 +172,41 @@
 	</div>
 </div>
 <script>
+	function deletealert(data) {
+		var id = data.getAttribute("data-id");
+		swal.fire({
+			title: 'Apakah kamu yakin?',
+			text: "Kamu tidak bisa mengembalikan data setelah terhapus!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.value) {
+				$.ajax({
+					type: "POST",
+					url: "<?= base_url() ?>sosiometri/deleteSingleSociometriResponse/" + id,
+					cache: false,
+					success: function(response) {
+						console.log('Delete response', response)
+						swal.fire({
+							title: 'Terhapus!',
+							text: 'Tunggu beberapa detik atau klik ok.',
+							type: 'success',
+							timer: 3000
+						}, function() {
+							window.location.reload();
+						});
+						setTimeout(function() {
+							window.location.reload();
+						}, 3000);
+					}
+				})
+			}
+		})
+	}
+
 	Highcharts.getSVG = function(charts) {
 		let top = 0;
 		let width = 0;
@@ -354,7 +397,8 @@
 							let y = res.occurrences[item.id] !== undefined ? res.occurrences[item.id] + 1 : 1
 							temp.push({
 								id: item.id,
-								name: item.id,
+								name: index + 1,
+								// name: item.id + ' - ' + item.nama,
 								// name: item.nis,
 								connections: item.connections,
 								rejection: item.pilihan_negatif ? item.pilihan_negatif : false,
