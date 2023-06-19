@@ -19,4 +19,10 @@ class GetModel extends CI_Model
 			'user_id' => $user_id
 		])->result();
 	}
+
+	public function deleteSociometriResponses($idKelas = '')
+	{
+		// return $this->db->query('DELETE a FROM sosiometri_respon a JOIN kelas_siswa b ON a.id_siswa = b.id WHERE b.id_kelas = 10');
+		return $this->db->query('DELETE a FROM sosiometri_respon a JOIN kelas_siswa b ON a.id_siswa = b.id WHERE b.id_kelas = ' . $idKelas);
+	}
 }

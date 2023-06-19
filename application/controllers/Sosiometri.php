@@ -19,19 +19,29 @@ class Sosiometri extends CI_Controller
 	public function index()
 	{
 		$kelas = $this->Main_model->join(
+			'kelas as a',
+			'*,d.nama_lengkap,count(c.id) as jumlah_respon',
+			[
+				[
+					'table' => 'kelas_siswa as b',
+					'parameter' => 'b.id_kelas=a.id'
+				],
+				[
+					'table' => 'sosiometri_respon as c',
+					'parameter' => 'c.id_siswa=b.id'
+				],
+				[
+					'table' => 'user_konselor as d',
+					'parameter' => 'd.id=a.konselor_id'
+				]
+			],
+			[
+				'a.user_id' => $this->session->userdata('id')
+			],
 			'kelas',
-			'*,kelas.id as id',
-			array(
-				array(
-					'table' => 'user_konselor',
-					'parameter' => 'user_konselor.id=kelas.konselor_id'
-				)
-			),
-			array(
-				'kelas.user_id' => $this->session->userdata('id')
-			),
-			'kelas',
-			'asc'
+			'asc',
+			'',
+			'a.id'
 		);
 
 		$konselor = $this->Main_model->get_where(
@@ -83,6 +93,17 @@ class Sosiometri extends CI_Controller
 		];
 
 		$this->load->view('main.php', $data, false);
+	}
+
+	public function deleteSociometriResponses($idKelas = '')
+	{
+		$this->GetModel->deleteSociometriResponses($idKelas);
+		// redirect('sosiometri');
+	}
+
+	public function deleteSingleSociometriResponse($idRespon = '')
+	{
+		$this->Main_model->delete_data('sosiometri_respon', ['id' => $idRespon]);
 	}
 
 	public function setcode()
@@ -158,9 +179,25 @@ class Sosiometri extends CI_Controller
 	public function detail($idKelas)
 	{
 		// Get sosiometri respon by class
+		// $sosiometriResponse = $this->Main_model->join(
+		// 	'sosiometri_respon',
+		// 	'*',
+		// 	[
+		// 		[
+		// 			'table' => 'kelas_siswa',
+		// 			'parameter' => 'kelas_siswa.id=sosiometri_respon.id_siswa'
+		// 		]
+		// 	],
+		// 	[
+		// 		'kelas_siswa.id_kelas' => $idKelas
+		// 	],
+		// 	'kelas_siswa.nis',
+		// 	'asc'
+		// );
+
 		$sosiometriResponse = $this->Main_model->join(
 			'sosiometri_respon',
-			'*',
+			'sosiometri_respon.*, sosiometri_respon.id as id_respon, kelas_siswa.*, kelas_siswa.id as id_siswa',
 			[
 				[
 					'table' => 'kelas_siswa',
@@ -170,7 +207,7 @@ class Sosiometri extends CI_Controller
 			[
 				'kelas_siswa.id_kelas' => $idKelas
 			],
-			'kelas_siswa.nis',
+			'kelas_siswa.nama',
 			'asc'
 		);
 
@@ -251,11 +288,11 @@ class Sosiometri extends CI_Controller
 		$amountOfSosiometriSiswa = $sosiometriSiswa ? count($sosiometriSiswa) : 0;
 		$sosiometriSiswaResponedOnly = $this->getRespondedStudentOnly($idKelas);
 		$amountOfResponded = $sosiometriSiswaResponedOnly ? count($sosiometriSiswaResponedOnly) : 0;
-		$lastRespondedDate = $sosiometriSiswaResponedOnly ? date('d/m/Y', strtotime($sosiometriSiswaResponedOnly[0]['created_at'])) : date('d/m/Y');
+		$lastRespondedDate = $sosiometriSiswaResponedOnly ? date('d/m/Y', strtotime($sosiometriSiswaResponedOnly[0]['tgl_submit'])) : date('d/m/Y');
 
 		$question = $this->getQuestion($idKelas);
 		$indexPilihan = $this->getStudentByClassWithResponse($idKelas);
-		// printA($question);
+		// printA($kelas);
 
 		$pdf = new PDF_Diag();
 		$pdf->AddPage();
@@ -395,22 +432,29 @@ class Sosiometri extends CI_Controller
 		$pdf->SetFont('Arial', 'B', 12);
 		$pdf->Cell(50, 6, 'C. INDEKS PILIHAN', 0, 0, 'L');
 		$pdf->Ln();
-		$header = ['NIS', 'NAMA', 'NILAI'];
+		$header = ['NO', 'NIS', 'NAMA', 'NILAI'];
 
 		$this->FancyTable($pdf, $header, $indexPilihan, $idKelas);
 
 		/**
 		 * FOOTER SECTION
 		 */
+		$footerDate = [
+			'date' => $sosiometriSiswaResponedOnly ? date('d', strtotime($sosiometriSiswaResponedOnly[0]['tgl_submit'])) : date('d'),
+			'month' => $sosiometriSiswaResponedOnly ? $this->convertMonth(date('m', strtotime($sosiometriSiswaResponedOnly[0]['tgl_submit']))) : $this->convertMonth(date('m')),
+			'year' => $sosiometriSiswaResponedOnly ? date('Y', strtotime($sosiometriSiswaResponedOnly[0]['tgl_submit'])) : date('Y')
+		];
+
 		$pdf->SetLeftMargin(10);
 		$pdf->Ln(5);
 		$pdf->SetFont('Arial', '', 12);
-		$pdf->Cell(178, 6, '......., ................. 20....', 0, 0, 'R');
+		$pdf->Cell(178, 6, $footerDate['date'] . ', ' . $footerDate['month'] . ' ' . $footerDate['year'], 0, 0, 'R');
+		// $pdf->Cell(178, 6, '......., ................. 20....', 0, 0, 'R');
 		$pdf->Ln();
-		$pdf->Cell(178, 6, 'Pengolah Data', 0, 0, 'R');
+		$pdf->Cell(178, 6, 'Guru Bimbingan dan Konseling', 0, 0, 'R');
 		$pdf->Ln(20);
-		// $pdf->Cell(178, 6, getField('user_konselor', 'nama_lengkap', array('id' => $kelas['konselor_id'])), 0, 0, 'R');
-		$pdf->Cell(178, 6, '(..........................................)', 0, 0, 'R');
+		// $pdf->Cell(178, 6, '(..........................................)', 0, 0, 'R');
+		$pdf->Cell(178, 6, getField('user_konselor', 'nama_lengkap', array('id' => $kelas['konselor_id'])), 0, 0, 'R');
 
 		// $pdf->SetTitle('Laporan Sosiometri ' . $get_kelompok[0]['nama_kelompok'] . '.pdf');
 		// $pdf->SetTitle('Laporan Sosiometri - ' . $kelas['kelas'] . '.pdf');
@@ -418,6 +462,26 @@ class Sosiometri extends CI_Controller
 		// $pdf->Output('I', 'Laporan Sosiometri ' . $get_kelompok[0]['nama_kelompok'] . '.pdf', FALSE);
 		header("Content-type:application/pdf");
 		$pdf->Output('D', 'Laporan Sosiometri - ' . $kelas['kelas'] . '.pdf', FALSE);
+	}
+
+	public function convertMonth($month)
+	{
+		$data = [
+			'Januari',
+			'Februari',
+			'Maret',
+			'April',
+			'Mei',
+			'Juni',
+			'Juli',
+			'Agustus',
+			'September',
+			'Oktober',
+			'November',
+			'Desember'
+		];
+
+		return $data[$month - 1];
 	}
 
 	public function reportTabulasiData($pdf, $tabulasiData)
@@ -468,8 +532,9 @@ class Sosiometri extends CI_Controller
 			$pdf->SetDrawColor(52, 58, 64);
 			$pdf->SetFont('Arial', 'B', 6);
 
+			$pdf->Cell(5, 10, 'NO', 1, 0, 'C', true);
 			$pdf->Cell(10, 10, 'NIS', 1, 0, 'C', true);
-			$pdf->Cell(30, 10, 'NAMA', 1, 0, 'L', true);
+			$pdf->Cell(25, 10, 'NAMA', 1, 0, 'L', true);
 			$pdf->Cell((count($dividedData) * 10), 5, 'Pemilih/Penolak', 1, 0, 'C', true);
 			$pdf->Cell(20, 10, 'BOBOT PEMILIH', 1, 0, 'C', true);
 			$pdf->Cell(20, 10, 'BOBOT PENOLAK', 1, 0, 'C', true);
@@ -486,10 +551,11 @@ class Sosiometri extends CI_Controller
 			$fill = false;
 
 			// Data rows
-			foreach ($tabulasiData['tabulasiData'] as $row) {
+			foreach ($tabulasiData['tabulasiData'] as $absen => $row) {
 				// $pdf->Cell(10, 5, '', 0, 0, 'C');
+				$pdf->Cell(5, 5, $absen + 1, 1, 0, 'C', $fill);
 				$pdf->Cell(10, 5, $row['nis'], 1, 0, 'C', $fill);
-				$pdf->Cell(30, 5, $row['nama'], 1, 0, 'L', $fill);
+				$pdf->Cell(25, 5, $row['nama'], 1, 0, 'L', $fill);
 
 				foreach ($dividedData as $indexNis => $arrayNIS) {
 					if ($row['pilihan']) {
@@ -702,9 +768,9 @@ class Sosiometri extends CI_Controller
 		$pdf->SetTextColor(255);
 		$pdf->SetDrawColor(52, 58, 64);
 		$pdf->SetLineWidth(.3);
-		$pdf->SetFont('Arial', 'B');
+		$pdf->SetFont('Arial', 'B', 8);
 		// Header
-		$w = array(15, 80, 50);
+		$w = array(5, 15, 80, 50);
 		for ($i = 0; $i < count($header); $i++)
 			$pdf->Cell($w[$i], 7, $header[$i], 1, 0, 'C', true);
 		$pdf->Ln();
@@ -714,7 +780,7 @@ class Sosiometri extends CI_Controller
 		$pdf->SetFont('Arial', '', '8');
 		// Data
 		$fill = false;
-		foreach ($data as $row) {
+		foreach ($data as $absen => $row) {
 			// $pdf->Cell($w[0], 6, $row[0], 'LR', 0, 'L', $fill);
 			// $pdf->Cell($w[1], 6, $row[1], 'LR', 0, 'L', $fill);
 			// $pdf->Cell($w[2], 6, number_format($row[2]), 'LR', 0, 'R', $fill);
@@ -723,9 +789,10 @@ class Sosiometri extends CI_Controller
 			// $fill = !$fill;
 			$nilai = $row['score_pemilih'] / $studentTotal == 0 ? 0 : number_format((float)($row['score_pemilih'] / $studentTotal), 2, ',', '');
 
-			$pdf->Cell($w[0], 6, $row['nis'], 'LR', 0, 'L', $fill);
-			$pdf->Cell($w[1], 6, $row['nama'], 'LR', 0, 'L', $fill);
-			$pdf->Cell($w[2], 6, $row['score_pemilih'] . ' / ' . $studentTotal . ' = ' . $nilai, 'LR', 0, 'R', $fill);
+			$pdf->Cell($w[0], 6, $absen + 1, 'LR', 0, 'C', $fill);
+			$pdf->Cell($w[1], 6, $row['nis'], 'LR', 0, 'C', $fill);
+			$pdf->Cell($w[2], 6, $row['nama'], 'LR', 0, 'L', $fill);
+			$pdf->Cell($w[3], 6, $row['score_pemilih'] . ' / ' . $studentTotal . ' = ' . $nilai, 'LR', 0, 'R', $fill);
 			$pdf->Ln();
 			$fill = !$fill;
 		}
@@ -792,7 +859,7 @@ class Sosiometri extends CI_Controller
 
 		$sosiometriResponse = $this->Main_model->join(
 			'sosiometri_respon',
-			'*',
+			'*,sosiometri_respon.created_at as tgl_submit',
 			[
 				[
 					'table' => 'kelas_siswa',
@@ -963,7 +1030,7 @@ class Sosiometri extends CI_Controller
 			[
 				'kelas_siswa.id_kelas' => $idKelas
 			],
-			'kelas_siswa.nis',
+			'kelas_siswa.nama',
 			'asc'
 		);
 
